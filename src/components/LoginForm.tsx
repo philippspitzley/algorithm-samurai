@@ -27,9 +27,17 @@ const formSchema = z.object({
   }),
 })
 
+interface LocationState {
+  from?: {
+    pathname?: string
+  }
+}
+
 export function LoginForm() {
-  const from: string = (useLocation().state as any)?.from?.pathname || "/"
+  const from: string =
+    (useLocation().state as LocationState)?.from?.pathname || "/"
   const authContext = useAuth()
+  const navigate = useNavigate()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -46,7 +54,7 @@ export function LoginForm() {
     const isLoggedIn = await authContext.login(values.email, values.password)
 
     if (isLoggedIn) {
-      useNavigate()(from, { replace: true })
+      navigate(from, { replace: true })
     }
   }
 
