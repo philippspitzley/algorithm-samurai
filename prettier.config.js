@@ -6,7 +6,7 @@ const config = {
   singleQuote: false,
   trailingComma: "all",
   plugins: [
-    // "@ianvs/prettier-plugin-sort-imports",
+    "@ianvs/prettier-plugin-sort-imports",
     "prettier-plugin-tailwindcss",
   ],
   importOrder: [
