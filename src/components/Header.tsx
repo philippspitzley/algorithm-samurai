@@ -1,10 +1,15 @@
 import { Link } from "react-router-dom"
 
+import { useAuth } from "@/context/auth/useAuth"
+
 import AvatarImg from "../assets/images/samurai-avatar.jpg"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
+import { Button } from "./ui/button"
 import { ThemeToggle } from "./ui/theme-toggle"
 
 function Header() {
+  const { logout } = useAuth()
+
   return (
     <header className="bg-secondary flex justify-center border-b px-8">
       <div className="flex w-2xl items-center justify-between py-2">
@@ -15,6 +20,7 @@ function Header() {
         <div className="flex items-center gap-4">
           <Link to="/courses">Courses</Link>
           <Link to="/login">Login</Link>
+          <Button onClick={logout}>Logout</Button>
           <ThemeToggle />
         </div>
 
