@@ -8,7 +8,7 @@ import { Button } from "./ui/button"
 import { ThemeToggle } from "./ui/theme-toggle"
 
 function Header() {
-  const { logout } = useAuth()
+  const { logout, isAuthenticated, user } = useAuth()
 
   return (
     <header className="bg-secondary flex justify-center border-b px-8">
@@ -18,9 +18,12 @@ function Header() {
         </span>
 
         <div className="flex items-center gap-4">
-          <Link to="/courses">Courses</Link>
-          <Link to="/login">Login</Link>
-          <Button onClick={logout}>Logout</Button>
+          {isAuthenticated && <Button onClick={logout}>Logout</Button>}
+          {!isAuthenticated && (
+            <Button>
+              <Link to="/login">Login</Link>
+            </Button>
+          )}
           <ThemeToggle />
         </div>
 
@@ -31,6 +34,17 @@ function Header() {
           </Avatar>
         </div>
       </div>
+      <nav>
+        <ul>
+          <li>
+            <Link to="/courses">Courses</Link>
+          </li>
+          <li>
+            {isAuthenticated && <Link to={`/users/${user?.id}`}>User</Link>}
+          </li>
+          <li>{user?.is_superuser && <Link to="/admin">Admin</Link>}</li>
+        </ul>
+      </nav>
     </header>
   )
 }
