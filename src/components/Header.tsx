@@ -4,11 +4,7 @@ import AvatarImg from "../assets/images/samurai-avatar.jpg"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { ThemeToggle } from "./ui/theme-toggle"
 
-interface Props {}
-
-function Header(props: Props) {
-  const {} = props
-
+function Header() {
   return (
     <header className="bg-secondary flex justify-center border-b px-8">
       <div className="flex w-2xl items-center justify-between py-2">
