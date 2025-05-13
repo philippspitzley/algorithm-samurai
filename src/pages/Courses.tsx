@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react"
 
+import { SquarePen, X } from "lucide-react"
+
 import { fetchData } from "@/api/fetch"
 import { getUrl } from "@/api/url-constants"
-import CodeBlock from "@/components/CodeElements/CodeBlock"
+import { Button } from "@/components/ui/button"
+import { Card, CardDescription, CardTitle } from "@/components/ui/card"
+import { useAuth } from "@/context/auth/useAuth"
 
 type apiResponse = {
   count: number | null
@@ -38,6 +42,7 @@ type Point = {
 function Courses() {
   const [courses, setCourse] = useState<Course[] | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const { user } = useAuth()
 
   async function getCourses() {
     setIsLoading(true)
@@ -52,40 +57,32 @@ function Courses() {
   }, [])
 
   return (
-    <main className="mt-8 flex justify-center px-4">
+    <main className="mt-8 px-4">
       {isLoading ? "Loading..." : null}
       {courses && (
-        <div>
+        <div className="flex flex-col items-center gap-4">
           {courses.map((course) => (
-            <div key={course.id} className="mx-auto w-2xl">
-              <div className="flex flex-col items-center gap-4 p-2">
-                <header className="self-start">
-                  <h2 className="text-primary font-samurai text-8xl uppercase">
-                    {course.title}
-                  </h2>
-
-                  <p>{course.description}</p>
-                </header>
-                <div className="w-2xl">
-                  <section>
-                    <h3 className="text-2xl">
-                      <span className="mr-4">
-                        {course.chapters[0].chapter_num}
-                      </span>
-                      <span>{course.chapters[0].title}</span>
-                    </h3>
-
-                    <p>{course.chapters[0].description}</p>
-                    <p>{course.chapters[0].points[0].chapter_point_num}</p>
-                    <p>{course.chapters[0].points[0].text}</p>
-                  </section>
-                </div>
-                <CodeBlock
-                  code={course.chapters[0].points[0].code_block}
-                  language="python"
-                />
+            <Card key={course.id} className="w-full max-w-3xl min-w-xs px-6">
+              <div className="flex justify-between">
+                <CardTitle className="text-lg">{course.title}</CardTitle>
+                {user?.is_superuser && (
+                  <div className="flex gap-2">
+                    <Button variant="secondary" size="icon">
+                      <SquarePen />
+                    </Button>
+                    <Button variant="destructive" size="icon">
+                      <X />
+                    </Button>
+                  </div>
+                )}
               </div>
-            </div>
+
+              <CardDescription className="-mt-4">
+                {course.description.split("\n").map((line, i) => (
+                  <p key={i + line}>{line}</p>
+                ))}
+              </CardDescription>
+            </Card>
           ))}
         </div>
       )}
