@@ -56,7 +56,7 @@ function CodeBlock(props: CodeBlockProps) {
   }
 
   return (
-    <div className="flex w-2xl justify-center">
+    <div className="container rounded-xl">
       <Card className="relative w-full">
         <CardHeader className="-mt-5 flex items-baseline gap-6">
           {fileName && (
