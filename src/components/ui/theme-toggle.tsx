@@ -4,7 +4,7 @@ import { Monitor, Moon, Sun } from "lucide-react"
 import { useTheme } from "@/context/theme/useTheme"
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
+  const { setTheme, selectedTheme } = useTheme()
 
   // totalLength: 134, knobLength: 44
   const variants = {
@@ -22,19 +22,19 @@ export function ThemeToggle() {
       {/* Icons */}
       <div className="relative flex h-full items-center justify-between px-4">
         <span
-          className={`z-10 translate-x-0.5 ${theme === "dark" ? "text-background" : "text-foreground/50"} cursor-pointer`}
+          className={`z-10 translate-x-0.5 ${selectedTheme === "dark" ? "text-background" : "text-foreground/50"} cursor-pointer`}
           onClick={() => setTheme("dark")}
         >
           <Moon size={16} />
         </span>
         <span
-          className={`z-10 ${theme === "system" ? "text-background" : "text-foreground/50"} cursor-pointer`}
+          className={`z-10 ${selectedTheme === "system" ? "text-background" : "text-foreground/50"} cursor-pointer`}
           onClick={() => setTheme("system")}
         >
           <Monitor size={16} />
         </span>
         <span
-          className={`z-10 ${theme === "light" ? "text-background" : "text-foreground/50"} cursor-pointer`}
+          className={`z-10 ${selectedTheme === "light" ? "text-background" : "text-foreground/50"} cursor-pointer`}
           onClick={() => setTheme("light")}
         >
           <Sun size={16} />
@@ -45,7 +45,7 @@ export function ThemeToggle() {
       <motion.div
         className={`bg-primary absolute top-[3px] h-6 w-11 rounded-full`}
         variants={variants}
-        animate={theme}
+        animate={selectedTheme}
         initial={false}
         transition={{
           type: "spring",

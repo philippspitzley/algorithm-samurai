@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from "react"
 
-import { Theme, ThemeProviderContext } from "@/context/theme/useTheme"
+import {
+  resolveTheme,
+  Theme,
+  ThemeProviderContext,
+} from "@/context/theme/useTheme"
 
 type ThemeProviderProps = {
   children: React.ReactNode
@@ -25,12 +29,12 @@ export function ThemeProvider({
       : defaultTheme
   }
 
-  function resolveTheme(theme: Theme): "dark" | "light" {
-    if (theme !== "system") return theme
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light"
-  }
+  // function resolveTheme(theme: Theme): "dark" | "light" {
+  //   if (theme !== "system") return theme
+  //   return window.matchMedia("(prefers-color-scheme: dark)").matches
+  //     ? "dark"
+  //     : "light"
+  // }
 
   useEffect(() => {
     const root = window.document.documentElement
@@ -58,6 +62,7 @@ export function ThemeProvider({
         localStorage.setItem(storageKey, theme)
         setTheme(theme)
       },
+      resolveTheme,
     }),
     [theme, storageKey],
   )

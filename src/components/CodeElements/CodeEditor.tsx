@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 
-import Editor, { Monaco } from "@monaco-editor/react"
+import Editor, { useMonaco } from "@monaco-editor/react"
 import { shikiToMonaco } from "@shikijs/monaco"
 import {
   Ban,
@@ -9,60 +9,99 @@ import {
   Sparkles,
   SquareTerminal,
 } from "lucide-react"
+import type { editor as MonacoEditorTypes } from "monaco-editor"
 import { createHighlighter, Highlighter } from "shiki"
 
-import { Button } from "../ui/button"
+import { useTheme } from "@/context/theme/useTheme"
 
-const THEMES = ["catppuccin-mocha", "catppuccin-latte", "catppuccin-frappe"]
+import { Button } from "../ui/button"
+import { Card } from "../ui/card"
+
 const LANGUAGES = ["javascript", "typescript"]
 
+type EditorThemes = EditorTheme.dark | EditorTheme.light
+enum EditorTheme {
+  light = "catppuccin-latte",
+  dark = "catppuccin-mocha",
+}
+
+type MonacoEditorInstance = MonacoEditorTypes.IStandaloneCodeEditor
+
 function CodeEditor() {
-  const editorRef = useRef(null)
-  const [monaco, setMonaco] = useState<Monaco | null>(null)
-  const [output, setOutput] = useState<string[]>([
-    "WTF, I am running VSCode in my browser 🤩",
+  const editorRef = useRef<MonacoEditorInstance | null>(null)
+  const { theme: appEffectiveTheme } = useTheme()
+  const monacoInstance = useMonaco()
+  const [editorOutput, setEditorOutput] = useState<string[]>([
+    "Welcome to your first exercise 👋",
   ])
+  const [currentEditorMonacoTheme, setCurrentEditorMonacoTheme] =
+    useState<EditorThemes>(
+      appEffectiveTheme === "dark" ? EditorTheme.dark : EditorTheme.light,
+    )
+  const [shikiHighlighter, setShikiHighlighter] = useState<Highlighter | null>(
+    null,
+  )
 
+  // Effect 1: Initialize Shiki (no changes needed here from your previous correct version)
   useEffect(() => {
-    async function setHilighter() {
-      const highlighter: Highlighter = await createHighlighter({
-        themes: THEMES,
-        langs: LANGUAGES,
-      })
-
-      if (monaco) {
-        LANGUAGES.map((lang) => monaco.languages.register({ id: lang }))
+    if (!monacoInstance || shikiHighlighter) {
+      return
+    }
+    let isMounted = true
+    async function initializeShiki() {
+      try {
+        const highlighter = await createHighlighter({
+          themes: [EditorTheme.dark, EditorTheme.light],
+          langs: LANGUAGES,
+        })
+        if (!isMounted) return
+        setShikiHighlighter(highlighter)
+        LANGUAGES.forEach((lang) => {
+          monacoInstance.languages.register({ id: lang })
+        })
+        shikiToMonaco(highlighter, monacoInstance)
+      } catch (error) {
+        console.error("Failed to initialize Shiki highlighter:", error)
       }
+    }
+    initializeShiki()
+    return () => {
+      isMounted = false
+    }
+  }, [monacoInstance, shikiHighlighter])
 
-      // Register the themes from Shiki, and provide syntax highlighting for Monaco.
-      shikiToMonaco(highlighter, monaco)
+  // Effect 2: Update the editor's active theme when appEffectiveTheme changes or Shiki setup completes.
+  useEffect(() => {
+    if (!monacoInstance || !shikiHighlighter) {
+      return // Wait for Monaco and Shiki to be ready
     }
 
-    if (monaco) {
-      setHilighter()
-    }
-  }, [monaco])
+    // appEffectiveTheme is already "light" or "dark"
+    const newMonacoTheme =
+      appEffectiveTheme === "dark" ? EditorTheme.dark : EditorTheme.light
 
-  function handleEditorDidMount(editor, monaco: Monaco) {
-    // here is the editor instance
-    // you can store it in `useRef` for further usage
+    monacoInstance.editor.setTheme(newMonacoTheme)
+    setCurrentEditorMonacoTheme(newMonacoTheme)
+  }, [appEffectiveTheme, monacoInstance, shikiHighlighter]) // Dependencies updated
+
+  function handleEditorDidMount(editor: MonacoEditorInstance) {
     editorRef.current = editor
-    setMonaco(monaco)
   }
 
   function addToTerminal() {
-    setOutput((prev) => [...prev, editorRef.current.getValue()])
+    setEditorOutput((prev) => [
+      ...prev,
+      editorRef.current ? editorRef.current.getValue() : "",
+    ])
   }
 
   function resetTerminal() {
-    setOutput([])
+    setEditorOutput([""])
   }
 
   // Function to trigger code formatting
   function formatCode() {
     if (editorRef.current) {
-      // editorRef.current.getAction('editor.action.formatDocument').run();
-      // A more direct way if the action ID is known and you don't need the action object:
       editorRef.current.trigger(
         "anyString",
         "editor.action.formatDocument",
@@ -72,49 +111,54 @@ function CodeEditor() {
   }
 
   return (
-    <>
-      <div className="relative h-80">
-        <Editor
-          height="100%"
-          theme="catppuccin-mocha"
-          defaultLanguage={"typescript"}
-          defaultValue={"// this is a comment"}
-          onMount={handleEditorDidMount}
-          options={{
-            minimap: { enabled: false },
-            scrollbar: { vertical: "hidden" },
-            fontSize: 16,
-            overviewRulerLanes: 0,
-          }}
-        />
+    <div className="container">
+      <Card className="bg-background rounded-xl py-6 pr-10 pl-4 shadow-2xl">
+        <div className="relative h-80">
+          <Editor
+            height="100%"
+            width="100%"
+            theme={currentEditorMonacoTheme}
+            defaultLanguage={"typescript"}
+            defaultValue={'console.log("Welcome to your first exercise 👋")'}
+            onMount={handleEditorDidMount}
+            options={{
+              minimap: { enabled: false },
+              scrollbar: { vertical: "hidden" },
+              fontSize: 16,
+              overviewRulerLanes: 0,
+            }}
+          />
 
-        <div className="absolute right-0 bottom-0 flex gap-2">
-          <Button size="icon" variant={"outline"} onClick={formatCode}>
-            <Sparkles />
-          </Button>
-          <Button size="icon" variant={"outline"} onClick={addToTerminal}>
-            <Play />
-          </Button>
-          <Button onClick={addToTerminal}>
-            <SendHorizonal />
-            Submit
-          </Button>
+          <div className="absolute right-0 -bottom-7 flex gap-2">
+            <Button size="icon" variant={"outline"} onClick={formatCode}>
+              <Sparkles />
+            </Button>
+            <Button size="icon" variant={"outline"} onClick={addToTerminal}>
+              <Play />
+            </Button>
+            <Button onClick={addToTerminal}>
+              <SendHorizonal />
+              Submit
+            </Button>
+          </div>
         </div>
-      </div>
-      <div className="mt-4 ml-6 min-h-16 rounded-lg bg-[#2B2B3C] px-4 py-4 text-left">
-        <div className="flex justify-between">
-          <h3 className="text-md mb-4 flex gap-2 opacity-70">
-            <SquareTerminal size={24} /> Console Output:
-          </h3>
-          <Button size="icon" variant="outline" onClick={resetTerminal}>
-            <Ban size={16} />
-          </Button>
-        </div>
-        {output.map((line) => (
-          <p className="text-violet-300">◉ {line}</p>
-        ))}
-      </div>
-    </>
+        <Card className="bg-primary/5 mt-4 ml-6 min-h-16 rounded-lg px-4 py-4 text-left shadow-none">
+          <div className="flex justify-between">
+            <h3 className="text-md mb-4 flex gap-2 opacity-70">
+              <SquareTerminal size={24} /> Console Output:
+            </h3>
+            <Button size="icon" variant="outline" onClick={resetTerminal}>
+              <Ban size={16} />
+            </Button>
+          </div>
+          {editorOutput.map((line, index) => (
+            <p key={index} className="text-terminal font-mono">
+              {line}
+            </p>
+          ))}
+        </Card>
+      </Card>
+    </div>
   )
 }
 
