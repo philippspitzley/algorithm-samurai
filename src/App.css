@@ -7,5 +7,5 @@
 }
 
 #root {
-  background-color: slateblue;
+  background-color: var(--color-background);
 }

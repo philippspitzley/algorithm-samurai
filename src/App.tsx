@@ -9,7 +9,8 @@ import Index from "@/pages/Index"
 import Login from "@/pages/Login"
 import NotFound from "@/pages/NotFound"
 
-import Header from "./components/Header"
+import Layout from "./components/Layout" // Import the Layout component
+import NewCourseForm from "./components/NewCourseForm" // Added missing import
 import ProtectedRoute from "./components/ProtectedRoute"
 import { AuthProvider } from "./context/auth/AuthProvider"
 import AdminDashboard from "./pages/admin/AdminDashboard"
@@ -20,20 +21,23 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <Router>
-          <Header />
-
           <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/courses" element={<Courses />}></Route>
-
-            <Route element={<ProtectedRoute />}>
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/users/:userId" element={<UserDashboard />} />
-              <Route path="/courses/:courseId" element={<Course />} />
+            <Route element={<Layout />}>
+              {/* Layout Routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/" element={<Index />} />
+              <Route path="/courses" element={<Courses />}></Route>
+              {/* Protected Routes */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/new-course" element={<NewCourseForm />} />
+                <Route path="/users/:userId" element={<UserDashboard />} />
+                <Route path="/courses/:courseId" element={<Course />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
             </Route>
 
-            <Route path="/login" element={<Login />} />
-            <Route path="*" element={<NotFound />} />
+            {/* Routes outside the main layout come here*/}
           </Routes>
         </Router>
       </AuthProvider>
