@@ -1,8 +1,8 @@
-const BASEURL = "http://127.0.0.1:8000/api/v1"
+const BASEURL = "http://localhost:8000/api/v1"
 
 const apiUrlPath = {
   courses: "/courses",
-  user: "/users/me",
+  userMe: "/users/me",
 }
 
 type ApiPath = keyof typeof apiUrlPath
