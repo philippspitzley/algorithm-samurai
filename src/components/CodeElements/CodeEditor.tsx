@@ -112,7 +112,7 @@ function CodeEditor() {
 
   return (
     <div className="container">
-      <Card className="bg-background rounded-xl py-6 pr-10 pl-4 shadow-2xl">
+      <Card className="bg-background gap-14 rounded-xl py-6 pr-10 pl-4 shadow-2xl">
         <div className="relative h-80">
           <Editor
             height="100%"
@@ -129,7 +129,7 @@ function CodeEditor() {
             }}
           />
 
-          <div className="absolute right-0 -bottom-7 flex gap-2">
+          <div className="absolute right-0 -bottom-11 flex gap-2">
             <Button size="icon" variant={"outline"} onClick={formatCode}>
               <Sparkles />
             </Button>
@@ -142,7 +142,7 @@ function CodeEditor() {
             </Button>
           </div>
         </div>
-        <Card className="bg-primary/5 mt-4 ml-6 min-h-16 rounded-lg px-4 py-4 text-left shadow-none">
+        <Card className="bg-primary/5 ml-6 min-h-16 rounded-lg px-4 py-4 text-left shadow-none">
           <div className="flex justify-between">
             <h3 className="text-md mb-4 flex gap-2 opacity-70">
               <SquareTerminal size={24} /> Console Output:
