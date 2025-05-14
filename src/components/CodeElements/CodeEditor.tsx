@@ -18,6 +18,9 @@ import { Button } from "../ui/button"
 import { Card } from "../ui/card"
 
 const LANGUAGES = ["javascript", "typescript"]
+const JUDGE0_API_KEY = import.meta.env.VITE_JUDGE0_API_KEY as string
+const JUDGE0_API_HOST = "judge0-ce.p.rapidapi.com"
+const POLLING_INTERVAL_MS = 3000
 
 type EditorThemes = EditorTheme.dark | EditorTheme.light
 enum EditorTheme {
@@ -27,6 +30,21 @@ enum EditorTheme {
 
 type MonacoEditorInstance = MonacoEditorTypes.IStandaloneCodeEditor
 
+// Define a type for the Judge0 submission response for better type safety
+interface Judge0Submission {
+  token: string
+  stdout?: string | null
+  stderr?: string | null
+  compile_output?: string | null
+  message?: string | null
+  status_id: number
+  status: {
+    id: number
+    description: string
+  }
+  // Add other fields you might need from the Judge0 response
+}
+
 function CodeEditor() {
   const editorRef = useRef<MonacoEditorInstance | null>(null)
   const { theme: appEffectiveTheme } = useTheme()
@@ -34,6 +52,7 @@ function CodeEditor() {
   const [editorOutput, setEditorOutput] = useState<string[]>([
     "Welcome to your first exercise 👋",
   ])
+
   const [currentEditorMonacoTheme, setCurrentEditorMonacoTheme] =
     useState<EditorThemes>(
       appEffectiveTheme === "dark" ? EditorTheme.dark : EditorTheme.light,
@@ -41,6 +60,14 @@ function CodeEditor() {
   const [shikiHighlighter, setShikiHighlighter] = useState<Highlighter | null>(
     null,
   )
+
+  // resolvedCode can store the full submission objects if needed
+  // const [resolvedCodeObjects, setResolvedCodeObjects] = useState<
+  //   Judge0Submission[]
+  // >([])
+  // const [codeToken, setCodeToken] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // Effect 1: Initialize Shiki (no changes needed here from your previous correct version)
   useEffect(() => {
@@ -84,19 +111,36 @@ function CodeEditor() {
     setCurrentEditorMonacoTheme(newMonacoTheme)
   }, [appEffectiveTheme, monacoInstance, shikiHighlighter]) // Dependencies updated
 
+  useEffect(() => {
+    // Clear any ongoing polling when the component unmounts
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current)
+      }
+    }
+  }, [])
+
   function handleEditorDidMount(editor: MonacoEditorInstance) {
     editorRef.current = editor
   }
 
-  function addToTerminal() {
-    setEditorOutput((prev) => [
-      ...prev,
-      editorRef.current ? editorRef.current.getValue() : "",
-    ])
-  }
+  // // This function can be kept for local logging or removed if not needed
+  // function addEditorContentToTerminal() {
+  //   setEditorOutput((prev) => [
+  //     ...prev,
+  //     "--- Editor Content ---",
+  //     editorRef.current ? editorRef.current.getValue() : "Editor is empty.",
+  //     "----------------------",
+  //   ])
+  // }
 
   function resetTerminal() {
-    setEditorOutput([""])
+    setEditorOutput(["Console cleared."])
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current)
+    }
+    setIsSubmitting(false)
+    // setCodeToken(null)
   }
 
   // Function to trigger code formatting
@@ -107,6 +151,207 @@ function CodeEditor() {
         "editor.action.formatDocument",
         null,
       )
+    }
+  }
+
+  async function requestCodeExecution() {
+    if (!editorRef.current) {
+      setEditorOutput((prev) => [...prev, "Error: Editor not initialized."])
+      return
+    }
+    if (isSubmitting) {
+      setEditorOutput((prev) => [
+        ...prev,
+        "A submission is already in progress.",
+      ])
+      return
+    }
+
+    const sourceCode = editorRef.current.getValue()
+    if (!sourceCode.trim()) {
+      setEditorOutput((prev) => [
+        ...prev,
+        "Warning: Editor is empty. Nothing to submit.",
+      ])
+      return
+    }
+
+    setIsSubmitting(true)
+    setEditorOutput((prev) => [...prev, "Submitting code..."])
+
+    // Clear previous polling if any
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current)
+    }
+
+    const encodedSourceCode = btoa(unescape(encodeURIComponent(sourceCode)))
+    const url =
+      "https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&wait=false&fields=token"
+    const options: RequestInit = {
+      method: "POST",
+      headers: {
+        "x-rapidapi-key": JUDGE0_API_KEY,
+        "x-rapidapi-host": JUDGE0_API_HOST,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        language_id: 102, // JavaScript (Node.js 22.08.0)
+        source_code: encodedSourceCode,
+      }),
+    }
+
+    try {
+      const response = await fetch(url, options)
+      const result = await response.json()
+
+      if (!response.ok || result.error || result.errors) {
+        const errorMessage =
+          result?.message ||
+          result?.error ||
+          result?.errors?.[0]?.message ||
+          JSON.stringify(result)
+        console.error(`API Error: ${response.status}`, result)
+        setEditorOutput((prev) => [
+          ...prev,
+          `Submission Error: ${errorMessage}`,
+        ])
+        setIsSubmitting(false)
+        return
+      }
+
+      if (result.token) {
+        // setCodeToken(result.token)
+        setEditorOutput((prev) => [
+          ...prev,
+          `Submission created. Token: ${result.token}. Fetching results...`,
+        ])
+        // Start polling immediately
+        getResolvedCodeFromToken(result.token)
+        // Set up interval polling
+        pollingIntervalRef.current = setInterval(() => {
+          getResolvedCodeFromToken(result.token)
+        }, POLLING_INTERVAL_MS) // Use the constant
+      } else {
+        console.error("Submission failed: No token received.", result)
+        setEditorOutput((prev) => [
+          ...prev,
+          `Submission failed: ${JSON.stringify(result)}`,
+        ])
+        setIsSubmitting(false)
+      }
+    } catch (error) {
+      console.error("Network or other error during code submission:", error)
+      const message =
+        error instanceof Error ? error.message : "An unknown error occurred."
+      setEditorOutput((prev) => [...prev, `Error: ${message}`])
+      setIsSubmitting(false)
+    }
+  }
+
+  async function getResolvedCodeFromToken(token: string | null) {
+    if (!token) return
+
+    const url = `https://judge0-ce.p.rapidapi.com/submissions/${token}?base64_encoded=true&fields=*`
+    const options: RequestInit = {
+      method: "GET",
+      headers: {
+        "x-rapidapi-key": JUDGE0_API_KEY,
+        "x-rapidapi-host": JUDGE0_API_HOST,
+      },
+    }
+
+    try {
+      const response = await fetch(url, options)
+      const result: Judge0Submission = await response.json()
+
+      if (!response.ok) {
+        const errorMessage = result?.message || JSON.stringify(result)
+        console.error(
+          `API Error fetching submission: ${response.status}`,
+          result,
+        )
+        // Don't stop polling on transient server errors, but log them
+        setEditorOutput((prev) => [
+          ...prev,
+          `Error fetching results (token: ${token}): ${response.status} - ${errorMessage}`,
+        ])
+        return
+      }
+
+      // setResolvedCodeObjects((prev) => [...prev, result]) // Store the full object if needed
+
+      // Status ID 1: In Queue, Status ID 2: Processing
+      if (result.status_id === 1 || result.status_id === 2) {
+        setEditorOutput((prev) => {
+          // Avoid duplicate "Processing..." messages if already there
+          const lastMessage = prev[prev.length - 1]
+          if (
+            lastMessage &&
+            lastMessage.startsWith(
+              `Status (token: ${token}): ${result.status.description}`,
+            )
+          ) {
+            return prev
+          }
+          return [
+            ...prev,
+            `Status (token: ${token}): ${result.status.description}...`,
+          ]
+        })
+        // Polling is handled by setInterval now
+      } else {
+        // Submission finished (Accepted, Wrong Answer, Error, etc.)
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current) // Stop polling
+          pollingIntervalRef.current = null
+        }
+        setIsSubmitting(false)
+        // setCodeToken(null) // Clear token once resolved
+
+        const outputLines: string[] = [`--- Result for token: ${token} ---`]
+        outputLines.push(`Status: ${result.status?.description || "Unknown"}`)
+
+        const decodeIfNeeded = (value: string | null | undefined) => {
+          if (!value) return ""
+          try {
+            return atob(value)
+          } catch (e) {
+            console.warn("Failed to decode base64 string:", value, e)
+            return value /* return raw if not base64 */
+          }
+        }
+
+        if (result.compile_output)
+          outputLines.push(
+            `Compile Output: ${decodeIfNeeded(result.compile_output)}`,
+          )
+        if (result.stdout)
+          outputLines.push(`Stdout: ${decodeIfNeeded(result.stdout)}`)
+        if (result.stderr)
+          outputLines.push(`Stderr: ${decodeIfNeeded(result.stderr)}`)
+        if (result.message)
+          outputLines.push(`Message: ${decodeIfNeeded(result.message)}`)
+        outputLines.push(`-------------------------`)
+
+        setEditorOutput((prev) => [...prev, ...outputLines])
+      }
+    } catch (error) {
+      console.error(
+        "Network or other error fetching submission details:",
+        error,
+      )
+      const message =
+        error instanceof Error ? error.message : "An unknown error occurred."
+      setEditorOutput((prev) => [
+        ...prev,
+        `Error fetching results (token: ${token}): ${message}`,
+      ])
+      // Potentially stop polling on certain errors
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current)
+        pollingIntervalRef.current = null
+      }
+      setIsSubmitting(false)
     }
   }
 
@@ -130,15 +375,31 @@ function CodeEditor() {
           />
 
           <div className="absolute right-0 -bottom-11 flex gap-2">
-            <Button size="icon" variant={"outline"} onClick={formatCode}>
+            <Button
+              size="icon"
+              variant={"outline"}
+              onClick={formatCode}
+              title="Format Code"
+            >
               <Sparkles />
             </Button>
-            <Button size="icon" variant={"outline"} onClick={addToTerminal}>
+            {/* The "Play" button can also trigger execution or be used for local tests if you implement that */}
+            <Button
+              size="icon"
+              variant={"outline"}
+              onClick={requestCodeExecution}
+              disabled={isSubmitting}
+              title="Run Code"
+            >
               <Play />
             </Button>
-            <Button onClick={addToTerminal}>
+            <Button
+              onClick={requestCodeExecution}
+              disabled={isSubmitting}
+              title="Submit Code"
+            >
               <SendHorizonal />
-              Submit
+              {isSubmitting ? "Submitting..." : "Submit"}
             </Button>
           </div>
         </div>
@@ -147,12 +408,22 @@ function CodeEditor() {
             <h3 className="text-md mb-4 flex gap-2 opacity-70">
               <SquareTerminal size={24} /> Console Output:
             </h3>
-            <Button size="icon" variant="outline" onClick={resetTerminal}>
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={resetTerminal}
+              title="Clear Console"
+            >
               <Ban size={16} />
             </Button>
           </div>
           {editorOutput.map((line, index) => (
-            <p key={index} className="text-terminal font-mono">
+            <p
+              key={index}
+              className="text-terminal font-mono whitespace-pre-wrap"
+            >
+              {" "}
+              {/* Added whitespace-pre-wrap */}
               {line}
             </p>
           ))}
