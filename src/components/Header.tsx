@@ -11,8 +11,8 @@ function Header() {
   const { logout, isAuthenticated, user } = useAuth()
 
   return (
-    <header className="mb-35 flex justify-center px-8">
-      <div className="bg-background/95 border-background fixed z-50 flex w-full items-center justify-between border-2 py-2 backdrop-blur-sm">
+    <header className="flex justify-center px-8">
+      <div className="bg-background fixed z-50 flex w-full items-center justify-between py-2">
         <div className="mx-auto flex w-full max-w-4xl items-center justify-between">
           <span className="font-samurai flex-1 translate-y-1 text-3xl uppercase">
             <Link to="/">AS</Link>
