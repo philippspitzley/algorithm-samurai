@@ -1,10 +1,10 @@
-import { LoginForm } from "@/components/LoginForm"
+import { SignUpForm } from "@/components/SignUpForm"
 
 function Login() {
   return (
     <>
       <main className="flex justify-center px-4">
-        <LoginForm />
+        <SignUpForm />
       </main>
     </>
   )

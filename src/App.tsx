@@ -8,9 +8,10 @@ import Courses from "@/pages/Courses"
 import Index from "@/pages/Index"
 import Login from "@/pages/Login"
 import NotFound from "@/pages/NotFound"
+import SignUp from "@/pages/SignUp"
 
-import Layout from "./components/Layout" // Import the Layout component
-import NewCourseForm from "./components/NewCourseForm" // Added missing import
+import NewCourseForm from "./components/Admin/NewCourseForm"
+import Layout from "./components/Layout"
 import ProtectedRoute from "./components/ProtectedRoute"
 import { AuthProvider } from "./context/auth/AuthProvider"
 import AdminDashboard from "./pages/admin/AdminDashboard"
@@ -25,6 +26,7 @@ function App() {
             <Route element={<Layout />}>
               {/* Layout Routes */}
               <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
               <Route path="/" element={<Index />} />
               <Route path="/courses" element={<Courses />}></Route>
               {/* Protected Routes */}

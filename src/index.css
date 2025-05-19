@@ -140,3 +140,16 @@
     font-family: var(--font-custom);
   }
 }
+
+@keyframes scale-x-to-zero-kf {
+  0% {
+    transform: scaleX(1);
+  }
+  100% {
+    transform: scaleX(0);
+  }
+}
+
+.animate-scale-x-progress {
+  animation: scale-x-to-zero-kf 5s linear forwards;
+}

@@ -10,9 +10,9 @@ interface Props {
 
 function AlertDestructive({ title, message }: Props) {
   return (
-    <Alert variant="destructive" className="border-destructive/60">
+    <Alert variant="destructive" className="border-destructive/60 text-left">
       <AlertCircle className="h-4 w-4" />
-      <AlertTitle>{title ? title.slice(2) : "Error"}</AlertTitle>
+      <AlertTitle>{title ? title : "Error"}</AlertTitle>
       <AlertDescription>{message} </AlertDescription>
     </Alert>
   )
