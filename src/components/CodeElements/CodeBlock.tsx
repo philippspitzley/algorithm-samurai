@@ -11,7 +11,7 @@ import { Separator } from "../ui/separator"
 
 interface CodeBlockProps {
   code: string
-  language: string
+  language?: string
   theme?: string
   fileName?: string
 }
@@ -20,7 +20,7 @@ function CodeBlock(props: CodeBlockProps) {
   const [highlightedCode, setHighlightedCode] = useState<string>("")
   const [copied, setCopied] = useState<boolean>(false)
   const { theme: websiteTheme } = useTheme()
-  const { code, language, theme: shikiTheme, fileName } = props
+  const { code, language = "javascript", theme: shikiTheme, fileName } = props
 
   const shikiThemeMap = {
     dark: "catppuccin-frappe",
