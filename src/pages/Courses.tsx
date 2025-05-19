@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react"
 
 import { SquarePen, X } from "lucide-react"
+import { Link } from "react-router-dom"
 
-import { fetchData } from "@/api/fetch"
+import { getData } from "@/api/fetch"
 import { getUrl } from "@/api/url-constants"
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardTitle } from "@/components/ui/card"
@@ -47,7 +48,7 @@ function Courses() {
   async function getCourses() {
     setIsLoading(true)
     const url = getUrl("courses")
-    const data = await fetchData<apiResponse>(url)
+    const data = await getData<apiResponse>(url)
     setCourse(data.data)
     setIsLoading(false)
   }
@@ -64,7 +65,9 @@ function Courses() {
           {courses.map((course) => (
             <Card key={course.id} className="w-full max-w-3xl min-w-xs px-6">
               <div className="flex justify-between">
-                <CardTitle className="text-lg">{course.title}</CardTitle>
+                <Link to={course.id}>
+                  <CardTitle className="text-lg">{course.title}</CardTitle>
+                </Link>
                 {user?.is_superuser && (
                   <div className="flex gap-2">
                     <Button variant="secondary" size="icon">
