@@ -4,7 +4,9 @@ export interface ApiError extends Error {
 }
 
 export async function getData<T>(url: string): Promise<T> {
-  const response = await fetch(url)
+  const response = await fetch(url, {
+    credentials: "include", // Add this line
+  })
 
   if (!response.ok) {
     let errorBody: any = null
@@ -83,10 +85,7 @@ export async function postData<T, U>(url: string, body: U): Promise<T> {
         errorMessage = `HTTP error! Status: ${response.status}. Response: ${JSON.stringify(errorBody)}`
       }
     } catch (e) {
-      console.warn(
-        "POST: Could not parse error response body as JSON or access detail.msg.",
-        e,
-      )
+      console.warn("POST: Could not parse error response body as JSON or access detail.msg.", e)
       try {
         const textBody = await response.text()
         if (textBody) {
@@ -111,13 +110,8 @@ export async function postData<T, U>(url: string, body: U): Promise<T> {
     const data: T = await response.json()
     return data
   } catch (e) {
-    console.error(
-      "POST: Successfully sent but failed to parse response JSON:",
-      e,
-    )
-    const error: any = new Error(
-      "POST: Failed to parse successful response as JSON.",
-    )
+    console.error("POST: Successfully sent but failed to parse response JSON:", e)
+    const error: any = new Error("POST: Failed to parse successful response as JSON.")
     error.status = response.status
     throw error
   }
