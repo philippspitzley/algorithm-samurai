@@ -31,3 +31,9 @@ export interface ChapterPoint {
   image?: string
   video?: string
 }
+
+export interface UserCourse {
+  user_id: string
+  course_id: string
+  finished_chapters: string[]
+}
