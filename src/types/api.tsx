@@ -7,7 +7,7 @@ export interface User {
 }
 
 export interface Course {
-  id: number
+  id: string
   title: string
   description: string
   chapters?: CourseChapter[]
@@ -19,6 +19,7 @@ export interface CourseChapter {
   chapter_num: number
   title: string
   description: string
+  exercise: string
   points?: ChapterPoint[]
 }
 
