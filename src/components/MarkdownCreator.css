@@ -1,0 +1,84 @@
+/* Custom styles for Markdown content */
+.prose h1 {
+  font-size: 2.25em;
+  font-weight: 700;
+  margin-bottom: 0.5em;
+}
+
+.prose h2 {
+  font-size: 1.875em;
+  font-weight: 700;
+  margin-bottom: 0.5em;
+}
+
+.prose p {
+  font-size: 1em;
+  line-height: 1.7;
+  margin-bottom: 1em;
+}
+
+.prose a {
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.prose a:hover {
+  color: #0056b3;
+}
+
+.prose img {
+  border-radius: var(--radius-lg);
+}
+
+.prose ul,
+.prose ol {
+  margin-left: 1.5em;
+  margin-bottom: 1em;
+}
+
+.prose ul {
+  list-style: disc;
+
+  ul {
+    list-style: circle;
+    margin-bottom: 0;
+  }
+}
+
+.prose ol {
+  list-style: decimal;
+
+  ol {
+    list-style: lower-alpha;
+    margin-bottom: 0;
+  }
+}
+
+.prose li {
+  margin-bottom: 0.25em;
+}
+
+/* For code blocks (often inside <pre><code>) */
+.prose pre {
+  padding-top: 2em;
+  padding-inline: 2em;
+  padding-bottom: 1em;
+  border-radius: 0.25rem;
+  overflow-x: auto;
+  margin-bottom: 1em;
+  border: 1px solid var(--color-border);
+}
+
+.prose pre code {
+  background-color: transparent; /* Code inside pre usually doesn't need its own background */
+  color: #333; /* Text color for code inside pre */
+  padding: 0;
+  font-size: 0.9em;
+}
+
+/* For inline code */
+.prose code {
+  padding: 0.2em 0.4em;
+  border-radius: 0.2rem;
+  font-size: 0.9em;
+}
