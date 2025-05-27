@@ -1,29 +1,18 @@
 import { useEffect, useRef, useState } from "react"
 
 import Editor, { useMonaco } from "@monaco-editor/react"
-import { shikiToMonaco } from "@shikijs/monaco"
 import { Ban, LoaderCircle, Play, SendHorizontal, Sparkles, SquareTerminal } from "lucide-react"
 import type { editor as MonacoEditorTypes } from "monaco-editor"
-import { createHighlighter, Highlighter } from "shiki"
 
 import { useTheme } from "@/context/theme/useTheme"
+import useShikiMonacoTheme from "@/hooks/useShikiMonacoTheme"
 
 import { Button } from "../ui/button"
 import { Card } from "../ui/card"
 
-const LANGUAGES = ["javascript", "typescript"]
 const JUDGE0_API_KEY = import.meta.env.VITE_JUDGE0_API_KEY as string
 const JUDGE0_API_HOST = "judge0-ce.p.rapidapi.com"
 const POLLING_INTERVAL_MS = 3000
-
-// Module-level cache for the Shiki highlighter promise
-let shikiHighlighterPromise: Promise<Highlighter> | null = null
-
-type EditorThemes = EditorTheme.dark | EditorTheme.light
-enum EditorTheme {
-  light = "catppuccin-latte",
-  dark = "catppuccin-mocha",
-}
 
 type MonacoEditorInstance = MonacoEditorTypes.IStandaloneCodeEditor
 
@@ -49,69 +38,10 @@ function CodeEditor({ defaultValue }: CodeEditorProps) {
   const editorRef = useRef<MonacoEditorInstance | null>(null)
   const { theme: appEffectiveTheme } = useTheme()
   const monacoInstance = useMonaco()
+  const { currentEditorMonacoTheme } = useShikiMonacoTheme(appEffectiveTheme, monacoInstance)
   const [editorOutput, setEditorOutput] = useState<string[]>(["Welcome to your first exercise 👋"])
-
-  const [currentEditorMonacoTheme, setCurrentEditorMonacoTheme] = useState<EditorThemes>(
-    appEffectiveTheme === "dark" ? EditorTheme.dark : EditorTheme.light,
-  )
-  const [shikiHighlighter, setShikiHighlighter] = useState<Highlighter | null>()
-
   const [isSubmitting, setIsSubmitting] = useState(false)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
-
-  // Effect 1: Initialize Shiki (modified for singleton pattern)
-  useEffect(() => {
-    if (!monacoInstance) return
-    if (shikiHighlighter) return
-
-    let isMounted = true
-
-    async function initializeShikiSingleton() {
-      if (!shikiHighlighterPromise) {
-        shikiHighlighterPromise = createHighlighter({
-          themes: [EditorTheme.dark, EditorTheme.light],
-          langs: LANGUAGES,
-        })
-      }
-
-      try {
-        const highlighter = await shikiHighlighterPromise
-        if (!isMounted) return
-
-        setShikiHighlighter(highlighter) // Set the resolved highlighter to local state
-
-        // Register languages and apply Shiki to Monaco
-        LANGUAGES.forEach((lang) => {
-          monacoInstance.languages.register({ id: lang })
-        })
-        shikiToMonaco(highlighter, monacoInstance)
-      } catch (error) {
-        if (isMounted) {
-          console.error("Failed to initialize Shiki highlighter:", error)
-        }
-        // If createHighlighter itself failed, nullify the promise to allow potential retry
-        shikiHighlighterPromise = null
-      }
-    }
-
-    initializeShikiSingleton()
-
-    return () => {
-      isMounted = false
-      // Do not dispose the shared highlighter here, as other instances might still be using it.
-    }
-  }, [monacoInstance, shikiHighlighter])
-
-  // Effect 2: Update the editor's active theme when appEffectiveTheme changes or Shiki setup completes.
-  useEffect(() => {
-    if (!monacoInstance || !shikiHighlighter) {
-      return
-    }
-
-    const newMonacoTheme = appEffectiveTheme === "dark" ? EditorTheme.dark : EditorTheme.light
-    monacoInstance.editor.setTheme(newMonacoTheme)
-    setCurrentEditorMonacoTheme(newMonacoTheme)
-  }, [appEffectiveTheme, monacoInstance, shikiHighlighter])
 
   useEffect(() => {
     // Clear any ongoing polling when the component unmounts
