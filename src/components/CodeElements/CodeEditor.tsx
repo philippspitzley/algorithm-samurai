@@ -2,13 +2,7 @@ import { useEffect, useRef, useState } from "react"
 
 import Editor, { useMonaco } from "@monaco-editor/react"
 import { shikiToMonaco } from "@shikijs/monaco"
-import {
-  Ban,
-  Play,
-  SendHorizonal,
-  Sparkles,
-  SquareTerminal,
-} from "lucide-react"
+import { Ban, LoaderCircle, Play, SendHorizontal, Sparkles, SquareTerminal } from "lucide-react"
 import type { editor as MonacoEditorTypes } from "monaco-editor"
 import { createHighlighter, Highlighter } from "shiki"
 
@@ -21,6 +15,9 @@ const LANGUAGES = ["javascript", "typescript"]
 const JUDGE0_API_KEY = import.meta.env.VITE_JUDGE0_API_KEY as string
 const JUDGE0_API_HOST = "judge0-ce.p.rapidapi.com"
 const POLLING_INTERVAL_MS = 3000
+
+// Module-level cache for the Shiki highlighter promise
+let shikiHighlighterPromise: Promise<Highlighter> | null = null
 
 type EditorThemes = EditorTheme.dark | EditorTheme.light
 enum EditorTheme {
@@ -42,74 +39,79 @@ interface Judge0Submission {
     id: number
     description: string
   }
-  // Add other fields you might need from the Judge0 response
 }
 
-function CodeEditor() {
+interface CodeEditorProps {
+  defaultValue?: string
+}
+
+function CodeEditor({ defaultValue }: CodeEditorProps) {
   const editorRef = useRef<MonacoEditorInstance | null>(null)
   const { theme: appEffectiveTheme } = useTheme()
   const monacoInstance = useMonaco()
-  const [editorOutput, setEditorOutput] = useState<string[]>([
-    "Welcome to your first exercise 👋",
-  ])
+  const [editorOutput, setEditorOutput] = useState<string[]>(["Welcome to your first exercise 👋"])
 
-  const [currentEditorMonacoTheme, setCurrentEditorMonacoTheme] =
-    useState<EditorThemes>(
-      appEffectiveTheme === "dark" ? EditorTheme.dark : EditorTheme.light,
-    )
-  const [shikiHighlighter, setShikiHighlighter] = useState<Highlighter | null>(
-    null,
+  const [currentEditorMonacoTheme, setCurrentEditorMonacoTheme] = useState<EditorThemes>(
+    appEffectiveTheme === "dark" ? EditorTheme.dark : EditorTheme.light,
   )
+  const [shikiHighlighter, setShikiHighlighter] = useState<Highlighter | null>()
 
-  // resolvedCode can store the full submission objects if needed
-  // const [resolvedCodeObjects, setResolvedCodeObjects] = useState<
-  //   Judge0Submission[]
-  // >([])
-  // const [codeToken, setCodeToken] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Effect 1: Initialize Shiki (no changes needed here from your previous correct version)
+  // Effect 1: Initialize Shiki (modified for singleton pattern)
   useEffect(() => {
-    if (!monacoInstance || shikiHighlighter) {
-      return
-    }
+    if (!monacoInstance) return
+    if (shikiHighlighter) return
+
     let isMounted = true
-    async function initializeShiki() {
-      try {
-        const highlighter = await createHighlighter({
+
+    async function initializeShikiSingleton() {
+      if (!shikiHighlighterPromise) {
+        shikiHighlighterPromise = createHighlighter({
           themes: [EditorTheme.dark, EditorTheme.light],
           langs: LANGUAGES,
         })
+      }
+
+      try {
+        const highlighter = await shikiHighlighterPromise
         if (!isMounted) return
-        setShikiHighlighter(highlighter)
+
+        setShikiHighlighter(highlighter) // Set the resolved highlighter to local state
+
+        // Register languages and apply Shiki to Monaco
         LANGUAGES.forEach((lang) => {
           monacoInstance.languages.register({ id: lang })
         })
         shikiToMonaco(highlighter, monacoInstance)
       } catch (error) {
-        console.error("Failed to initialize Shiki highlighter:", error)
+        if (isMounted) {
+          console.error("Failed to initialize Shiki highlighter:", error)
+        }
+        // If createHighlighter itself failed, nullify the promise to allow potential retry
+        shikiHighlighterPromise = null
       }
     }
-    initializeShiki()
+
+    initializeShikiSingleton()
+
     return () => {
       isMounted = false
+      // Do not dispose the shared highlighter here, as other instances might still be using it.
     }
   }, [monacoInstance, shikiHighlighter])
 
   // Effect 2: Update the editor's active theme when appEffectiveTheme changes or Shiki setup completes.
   useEffect(() => {
     if (!monacoInstance || !shikiHighlighter) {
-      return // Wait for Monaco and Shiki to be ready
+      return
     }
 
-    // appEffectiveTheme is already "light" or "dark"
-    const newMonacoTheme =
-      appEffectiveTheme === "dark" ? EditorTheme.dark : EditorTheme.light
-
+    const newMonacoTheme = appEffectiveTheme === "dark" ? EditorTheme.dark : EditorTheme.light
     monacoInstance.editor.setTheme(newMonacoTheme)
     setCurrentEditorMonacoTheme(newMonacoTheme)
-  }, [appEffectiveTheme, monacoInstance, shikiHighlighter]) // Dependencies updated
+  }, [appEffectiveTheme, monacoInstance, shikiHighlighter])
 
   useEffect(() => {
     // Clear any ongoing polling when the component unmounts
@@ -124,16 +126,6 @@ function CodeEditor() {
     editorRef.current = editor
   }
 
-  // // This function can be kept for local logging or removed if not needed
-  // function addEditorContentToTerminal() {
-  //   setEditorOutput((prev) => [
-  //     ...prev,
-  //     "--- Editor Content ---",
-  //     editorRef.current ? editorRef.current.getValue() : "Editor is empty.",
-  //     "----------------------",
-  //   ])
-  // }
-
   function resetTerminal() {
     setEditorOutput(["Console cleared."])
     if (pollingIntervalRef.current) {
@@ -146,11 +138,7 @@ function CodeEditor() {
   // Function to trigger code formatting
   function formatCode() {
     if (editorRef.current) {
-      editorRef.current.trigger(
-        "anyString",
-        "editor.action.formatDocument",
-        null,
-      )
+      editorRef.current.trigger("anyString", "editor.action.formatDocument", null)
     }
   }
 
@@ -160,19 +148,13 @@ function CodeEditor() {
       return
     }
     if (isSubmitting) {
-      setEditorOutput((prev) => [
-        ...prev,
-        "A submission is already in progress.",
-      ])
+      setEditorOutput((prev) => [...prev, "A submission is already in progress."])
       return
     }
 
     const sourceCode = editorRef.current.getValue()
     if (!sourceCode.trim()) {
-      setEditorOutput((prev) => [
-        ...prev,
-        "Warning: Editor is empty. Nothing to submit.",
-      ])
+      setEditorOutput((prev) => [...prev, "Warning: Editor is empty. Nothing to submit."])
       return
     }
 
@@ -206,15 +188,9 @@ function CodeEditor() {
 
       if (!response.ok || result.error || result.errors) {
         const errorMessage =
-          result?.message ||
-          result?.error ||
-          result?.errors?.[0]?.message ||
-          JSON.stringify(result)
+          result?.message || result?.error || result?.errors?.[0]?.message || JSON.stringify(result)
         console.error(`API Error: ${response.status}`, result)
-        setEditorOutput((prev) => [
-          ...prev,
-          `Submission Error: ${errorMessage}`,
-        ])
+        setEditorOutput((prev) => [...prev, `Submission Error: ${errorMessage}`])
         setIsSubmitting(false)
         return
       }
@@ -233,16 +209,12 @@ function CodeEditor() {
         }, POLLING_INTERVAL_MS) // Use the constant
       } else {
         console.error("Submission failed: No token received.", result)
-        setEditorOutput((prev) => [
-          ...prev,
-          `Submission failed: ${JSON.stringify(result)}`,
-        ])
+        setEditorOutput((prev) => [...prev, `Submission failed: ${JSON.stringify(result)}`])
         setIsSubmitting(false)
       }
     } catch (error) {
       console.error("Network or other error during code submission:", error)
-      const message =
-        error instanceof Error ? error.message : "An unknown error occurred."
+      const message = error instanceof Error ? error.message : "An unknown error occurred."
       setEditorOutput((prev) => [...prev, `Error: ${message}`])
       setIsSubmitting(false)
     }
@@ -266,10 +238,7 @@ function CodeEditor() {
 
       if (!response.ok) {
         const errorMessage = result?.message || JSON.stringify(result)
-        console.error(
-          `API Error fetching submission: ${response.status}`,
-          result,
-        )
+        console.error(`API Error fetching submission: ${response.status}`, result)
         // Don't stop polling on transient server errors, but log them
         setEditorOutput((prev) => [
           ...prev,
@@ -287,16 +256,11 @@ function CodeEditor() {
           const lastMessage = prev[prev.length - 1]
           if (
             lastMessage &&
-            lastMessage.startsWith(
-              `Status (token: ${token}): ${result.status.description}`,
-            )
+            lastMessage.startsWith(`Status (token: ${token}): ${result.status.description}`)
           ) {
             return prev
           }
-          return [
-            ...prev,
-            `Status (token: ${token}): ${result.status.description}...`,
-          ]
+          return [...prev, `Status (token: ${token}): ${result.status.description}...`]
         })
         // Polling is handled by setInterval now
       } else {
@@ -322,30 +286,18 @@ function CodeEditor() {
         }
 
         if (result.compile_output)
-          outputLines.push(
-            `Compile Output: ${decodeIfNeeded(result.compile_output)}`,
-          )
-        if (result.stdout)
-          outputLines.push(`Stdout: ${decodeIfNeeded(result.stdout)}`)
-        if (result.stderr)
-          outputLines.push(`Stderr: ${decodeIfNeeded(result.stderr)}`)
-        if (result.message)
-          outputLines.push(`Message: ${decodeIfNeeded(result.message)}`)
+          outputLines.push(`Compile Output: ${decodeIfNeeded(result.compile_output)}`)
+        if (result.stdout) outputLines.push(`Stdout: ${decodeIfNeeded(result.stdout)}`)
+        if (result.stderr) outputLines.push(`Stderr: ${decodeIfNeeded(result.stderr)}`)
+        if (result.message) outputLines.push(`Message: ${decodeIfNeeded(result.message)}`)
         outputLines.push(`-------------------------`)
 
         setEditorOutput((prev) => [...prev, ...outputLines])
       }
     } catch (error) {
-      console.error(
-        "Network or other error fetching submission details:",
-        error,
-      )
-      const message =
-        error instanceof Error ? error.message : "An unknown error occurred."
-      setEditorOutput((prev) => [
-        ...prev,
-        `Error fetching results (token: ${token}): ${message}`,
-      ])
+      console.error("Network or other error fetching submission details:", error)
+      const message = error instanceof Error ? error.message : "An unknown error occurred."
+      setEditorOutput((prev) => [...prev, `Error fetching results (token: ${token}): ${message}`])
       // Potentially stop polling on certain errors
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current)
@@ -363,8 +315,8 @@ function CodeEditor() {
             height="100%"
             width="100%"
             theme={currentEditorMonacoTheme}
-            defaultLanguage={"typescript"}
-            defaultValue={'console.log("Welcome to your first exercise 👋")'}
+            defaultLanguage={"javascript"}
+            defaultValue={defaultValue}
             onMount={handleEditorDidMount}
             options={{
               minimap: { enabled: false },
@@ -375,12 +327,7 @@ function CodeEditor() {
           />
 
           <div className="absolute right-0 -bottom-11 flex gap-2">
-            <Button
-              size="icon"
-              variant={"outline"}
-              onClick={formatCode}
-              title="Format Code"
-            >
+            <Button size="icon" variant={"outline"} onClick={formatCode} title="Format Code">
               <Sparkles />
             </Button>
             {/* The "Play" button can also trigger execution or be used for local tests if you implement that */}
@@ -393,13 +340,9 @@ function CodeEditor() {
             >
               <Play />
             </Button>
-            <Button
-              onClick={requestCodeExecution}
-              disabled={isSubmitting}
-              title="Submit Code"
-            >
-              <SendHorizonal />
-              {isSubmitting ? "Submitting..." : "Submit"}
+            <Button onClick={requestCodeExecution} disabled={isSubmitting} title="Submit Code">
+              <SendHorizontal />
+              {isSubmitting ? <LoaderCircle className="animate-spin" /> : "Submit"}
             </Button>
           </div>
         </div>
@@ -408,20 +351,12 @@ function CodeEditor() {
             <h3 className="text-md mb-4 flex gap-2 opacity-70">
               <SquareTerminal size={24} /> Console Output:
             </h3>
-            <Button
-              size="icon"
-              variant="outline"
-              onClick={resetTerminal}
-              title="Clear Console"
-            >
+            <Button size="icon" variant="outline" onClick={resetTerminal} title="Clear Console">
               <Ban size={16} />
             </Button>
           </div>
           {editorOutput.map((line, index) => (
-            <p
-              key={index}
-              className="text-terminal font-mono whitespace-pre-wrap"
-            >
+            <p key={index} className="text-terminal font-mono whitespace-pre-wrap">
               {" "}
               {/* Added whitespace-pre-wrap */}
               {line}
