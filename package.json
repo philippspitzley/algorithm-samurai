@@ -31,6 +31,7 @@
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.56.2",
     "react-router-dom": "^7.5.3",
+    "shiki-codegen": "^3.4.2",
     "sonner": "^2.0.3",
     "tailwind-merge": "^3.2.0",
     "tailwindcss": "^4.1.5",
