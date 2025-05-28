@@ -6,15 +6,19 @@ import { fromAsyncCodeToHtml } from "@shikijs/markdown-it/async"
 import MarkdownItAsync from "markdown-it-async"
 
 import { useTheme } from "@/context/theme/useTheme"
+import { cn } from "@/lib/utils"
 import { BundledTheme, codeToHtml } from "@/shiki-highlighter/shiki.bundle"
 
 interface Props {
-  markdown: string
+  markdown: string | undefined
+  className?: string
 }
 
-function Markdown({ markdown }: Props) {
+function Markdown({ markdown, className }: Props) {
   const [html, setHtml] = useState<string>("")
   const { theme: appTheme } = useTheme()
+
+  const styles = cn("prose", className)
 
   const SHIKITHEME_MAP: Record<typeof appTheme, BundledTheme> = {
     light: "catppuccin-latte",
@@ -50,7 +54,7 @@ function Markdown({ markdown }: Props) {
     renderMarkdownAsync()
   }, [markdown, mdParser])
 
-  return <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />
+  return <div className={styles} dangerouslySetInnerHTML={{ __html: html }} />
 }
 
 export default Markdown
