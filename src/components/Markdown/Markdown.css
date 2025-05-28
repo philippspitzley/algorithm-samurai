@@ -11,10 +11,25 @@
   margin-bottom: 0.5em;
 }
 
+.prose h3 {
+  font-size: 1.65em;
+  font-weight: 700;
+  margin-bottom: 0.5em;
+}
+
+.prose h4 {
+  font-size: 1.4em;
+  font-weight: 700;
+  margin-bottom: 0.5em;
+}
+
 .prose p {
   font-size: 1em;
   line-height: 1.7;
-  margin-bottom: 1em;
+}
+
+.prose p:last-child {
+  margin-bottom: 5em;
 }
 
 .prose a {

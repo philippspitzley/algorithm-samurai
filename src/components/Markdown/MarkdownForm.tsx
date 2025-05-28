@@ -1,10 +1,10 @@
-"use client"
-
 import { zodResolver } from "@hookform/resolvers/zod"
+import { LoaderCircle } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 
+import Markdown from "@/components/Markdown/Markdown"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -14,47 +14,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import { Textarea } from "@/components/ui/textarea"
 
-import "./MarkdownCreator.css"
-
-import { useEffect, useMemo, useState } from "react"
-
-import { fromAsyncCodeToHtml } from "@shikijs/markdown-it/async"
-import { LoaderCircle } from "lucide-react"
-import MarkdownItAsync from "markdown-it-async"
-
-import { useTheme } from "@/context/theme/useTheme"
-
-import { BundledTheme, codeToHtml } from "../shiki-highlighter/shiki.bundle"
-import { Textarea } from "./ui/textarea"
-
-function MarkdownTest() {
-  const [html, setHtml] = useState<string>("")
-  const { theme: appTheme } = useTheme()
-
-  const SHIKITHEME_MAP: Record<typeof appTheme, BundledTheme> = {
-    light: "catppuccin-latte",
-    dark: "catppuccin-mocha",
-  }
-
-  const currentShikiTheme = SHIKITHEME_MAP[appTheme]
-
-  const mdParser = useMemo(() => {
-    const instance = MarkdownItAsync({
-      html: true,
-      linkify: true,
-      typographer: true,
-    })
-
-    instance.use(
-      fromAsyncCodeToHtml(codeToHtml, {
-        theme: currentShikiTheme,
-      }),
-    )
-
-    return instance
-  }, [currentShikiTheme])
-
+function MarkdownForm() {
   const FormSchema = z.object({
     markdown: z.string(),
   })
@@ -65,20 +27,8 @@ function MarkdownTest() {
 
   const watchedMarkdown = form.watch("markdown")
 
-  useEffect(() => {
-    const renderMarkdownAsync = async () => {
-      if (typeof watchedMarkdown === "string") {
-        const renderedHtml = await mdParser.renderAsync(watchedMarkdown)
-        setHtml(renderedHtml)
-      } else {
-        setHtml("")
-      }
-    }
-
-    renderMarkdownAsync()
-  }, [watchedMarkdown, mdParser])
-
   async function onSubmit(data: z.infer<typeof FormSchema>) {
+    // delay to simulate saving to a database
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
     toast("You submitted the following values:", {
@@ -96,6 +46,7 @@ function MarkdownTest() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="relative w-1/3">
           <FormField
+            disabled={form.formState.isSubmitting}
             control={form.control}
             name="markdown"
             render={({ field }) => (
@@ -104,8 +55,7 @@ function MarkdownTest() {
                 <FormControl>
                   <Textarea
                     placeholder="# My Markdown!"
-                    className="dark:bg-background resize-none px-8 pt-10 pb-14 font-mono"
-                    disabled={form.formState.isSubmitting}
+                    className="dark:bg-background bg-background resize-none px-8 pt-10 pb-14 font-mono"
                     {...field}
                   />
                 </FormControl>
@@ -126,9 +76,9 @@ function MarkdownTest() {
         </form>
       </Form>
 
-      <div className="prose flex-2" dangerouslySetInnerHTML={{ __html: html }}></div>
+      <Markdown markdown={watchedMarkdown} />
     </div>
   )
 }
 
-export default MarkdownTest
+export default MarkdownForm
