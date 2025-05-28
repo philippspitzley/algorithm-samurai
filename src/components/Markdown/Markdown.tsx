@@ -40,6 +40,8 @@ function Markdown({ markdown }: Props) {
   }, [currentShikiTheme])
 
   useEffect(() => {
+    if (markdown === undefined) return
+
     const renderMarkdownAsync = async () => {
       const renderedHtml = await mdParser.renderAsync(markdown)
       setHtml(renderedHtml)
