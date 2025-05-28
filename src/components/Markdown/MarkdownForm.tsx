@@ -46,7 +46,6 @@ function MarkdownForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="relative w-1/3">
           <FormField
-            disabled={form.formState.isSubmitting}
             control={form.control}
             name="markdown"
             render={({ field }) => (
@@ -54,6 +53,7 @@ function MarkdownForm() {
                 <FormLabel className="absolute top-3 right-4">Markdown Editor</FormLabel>
                 <FormControl>
                   <Textarea
+                    disabled={form.formState.isSubmitting}
                     placeholder="# My Markdown!"
                     className="dark:bg-background bg-background resize-none px-8 pt-10 pb-14 font-mono"
                     {...field}
