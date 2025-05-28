@@ -1,3 +1,5 @@
+import { useEffect } from "react"
+
 import { zodResolver } from "@hookform/resolvers/zod"
 import { LoaderCircle } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -16,35 +18,44 @@ import {
 } from "@/components/ui/form"
 import { Textarea } from "@/components/ui/textarea"
 
-function MarkdownForm() {
+interface Props {
+  defaultValue: string | undefined
+  callbackFn: (body: { description: string }) => Promise<void> | void
+}
+
+function MarkdownForm({ defaultValue, callbackFn }: Props) {
   const FormSchema = z.object({
-    markdown: z.string(),
+    markdown: z.string().min(1, { message: "Provide at least one character!" }),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
+    defaultValues: {
+      markdown: defaultValue || "",
+    },
   })
+  const watchedMarkdown = form.watch("markdown") // acts like a controlled input
 
-  const watchedMarkdown = form.watch("markdown")
+  useEffect(() => {
+    if (defaultValue !== undefined && defaultValue !== form.getValues("markdown")) {
+      form.reset({ markdown: defaultValue || "" })
+    }
+  }, [defaultValue, form])
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    // delay to simulate saving to a database
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    if (data.markdown === defaultValue) {
+      toast.info("No changes detected!")
+      return
+    }
+    const body = { description: data.markdown }
 
-    toast("You submitted the following values:", {
-      description: data.markdown,
-      action: {
-        label: "Undo",
-        onClick: () => console.log("Undo"),
-      },
-    })
-    console.log("Save data to db: ", data)
+    await callbackFn(body)
   }
 
   return (
     <div className="container flex gap-8">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="relative w-1/3">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="relative flex-3">
           <FormField
             control={form.control}
             name="markdown"
@@ -63,20 +74,29 @@ function MarkdownForm() {
               </FormItem>
             )}
           />
-          <Button type="submit" disabled={form.formState.isSubmitting} className="mt-2 w-full">
-            {form.formState.isSubmitting ? (
-              <>
-                <LoaderCircle className="animate-spin" />
-                Saving
-              </>
-            ) : (
-              "Save"
-            )}
-          </Button>
+          <div className="mt-2 flex gap-4">
+            <Button type="submit" disabled={form.formState.isSubmitting} className="flex-1/2">
+              {form.formState.isSubmitting ? (
+                <>
+                  <LoaderCircle className="animate-spin" />
+                  Saving
+                </>
+              ) : (
+                "Save"
+              )}
+            </Button>
+            <Button
+              type="reset"
+              onClick={() => form.reset({ markdown: defaultValue || "" })}
+              variant="outline"
+            >
+              Reset
+            </Button>
+          </div>
         </form>
       </Form>
 
-      <Markdown markdown={watchedMarkdown} />
+      <Markdown markdown={watchedMarkdown} className="flex-4" />
     </div>
   )
 }
