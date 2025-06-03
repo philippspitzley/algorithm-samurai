@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom"
 
-import Courses from "@/components/Coureses/Courses"
+import Courses from "@/components/Courses/Courses"
 import { ThemeProvider } from "@/context/theme/ThemeProvider"
 import Course from "@/pages/Course"
 import Index from "@/pages/Index"
