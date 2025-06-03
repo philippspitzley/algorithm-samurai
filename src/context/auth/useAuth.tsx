@@ -1,10 +1,10 @@
 import { createContext, use } from "react"
 
-import { User } from "@/types/api"
+import { type User } from "./AuthProvider"
 
 interface AuthContextType {
   isAuthenticated: boolean
-  user: User | null // Use the User interface
+  user: User | null
   login: (email: string, password: string) => Promise<boolean>
   logout: () => Promise<void>
   loading: boolean

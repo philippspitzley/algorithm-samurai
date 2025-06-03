@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 
-import { User } from "@/types/api"
+import { APISchemas } from "@/api/types"
 
 import { AuthContext } from "./useAuth"
 
+export type User = APISchemas["UserPublic"]
 const HOST = "http://localhost:8000/api/v1"
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState("")
@@ -29,7 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         if (response.ok) {
           const userData = await response.json()
-          setUser(userData as User) // Cast to User
+          setUser(userData as User)
         } else {
           const errorData = await response.json().catch(() => ({}))
           if (errorData?.detail) {
@@ -93,17 +92,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           return true
         } else {
           const errorData = await userResponse.json().catch(() => ({}))
-          setErrorMessage(
-            errorData?.detail || "Failed to fetch user data after login.",
-          )
+          setErrorMessage(errorData?.detail || "Failed to fetch user data after login.")
           return false
         }
       } catch (error) {
         console.error("Login failed", error)
         setErrorMessage(
-          error instanceof Error
-            ? error.message
-            : "An unexpected error occurred during login.",
+          error instanceof Error ? error.message : "An unexpected error occurred during login.",
         )
         return false
       } finally {
@@ -124,11 +119,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setUser(null)
     } catch (error) {
       console.error("Logout failed:", error)
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Logout failed. Please try again.",
-      )
+      setErrorMessage(error instanceof Error ? error.message : "Logout failed. Please try again.")
     } finally {
       setLoading(false)
     }
