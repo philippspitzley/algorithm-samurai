@@ -10,7 +10,8 @@
     "format": "prettier --write .",
     "check": "prettier --write . && eslint --fix",
     "preview": "vite preview",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "generate:openapi": "openapi-typescript http://127.0.0.1:8000/api/v1/openapi.json -o ./src/api/openapi-schemas.d.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
