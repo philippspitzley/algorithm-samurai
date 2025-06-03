@@ -1,4 +1,5 @@
 import js from "@eslint/js"
+import pluginQuery from "@tanstack/eslint-plugin-query"
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended"
 import reactDom from "eslint-plugin-react-dom"
 import reactHooks from "eslint-plugin-react-hooks"
@@ -24,13 +25,11 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      "react-refresh/only-export-components": [
-        "warn",
-        { allowConstantExport: true },
-      ],
+      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       ...reactX.configs["recommended-typescript"].rules,
       ...reactDom.configs.recommended.rules,
     },
   },
+  ...pluginQuery.configs["flat/recommended"],
   eslintPluginPrettierRecommended,
 )

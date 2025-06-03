@@ -1,5 +1,7 @@
 import "./App.css"
 
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom"
 
 import { ThemeProvider } from "@/context/theme/ThemeProvider"
@@ -15,34 +17,41 @@ import Layout from "./components/Layout"
 import ProtectedRoute from "./components/ProtectedRoute"
 import { AuthProvider } from "./context/auth/AuthProvider"
 import AdminDashboard from "./pages/admin/AdminDashboard"
+import Chapter from "./pages/Chapter"
+import CourseLayout from "./pages/CourseLayout"
 import UserDashboard from "./pages/user/UserDashboard"
+
+const queryClient = new QueryClient()
 
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <Router>
-          <Routes>
-            <Route element={<Layout />}>
-              {/* Layout Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/" element={<Index />} />
-              <Route path="/courses" element={<Courses />}></Route>
-              {/* Protected Routes */}
-              <Route element={<ProtectedRoute />}>
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/admin/new-course" element={<NewCourseForm />} />
-                <Route path="/users/:userId" element={<UserDashboard />} />
-                <Route path="/courses/:courseId" element={<Course />} />
-              </Route>
-              <Route path="*" element={<NotFound />} />
-            </Route>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <Router>
+            <Routes>
+              <Route element={<Layout />}>
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<SignUp />} />
+                <Route path="/" element={<Index />} />
+                <Route path="/courses" element={<Courses />}></Route>
 
-            {/* Routes outside the main layout come here*/}
-          </Routes>
-        </Router>
-      </AuthProvider>
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="/admin/new-course" element={<NewCourseForm />} />
+                  <Route path="/users/:userId" element={<UserDashboard />} />
+                  <Route element={<CourseLayout />}>
+                    <Route path="/courses/:courseId" element={<Course />} />
+                    <Route path="/courses/:courseId/:chapterId" element={<Chapter />} />
+                  </Route>
+                </Route>
+                <Route path="*" element={<NotFound />} />
+              </Route>
+            </Routes>
+          </Router>
+        </AuthProvider>
+        <ReactQueryDevtools />
+      </QueryClientProvider>
     </ThemeProvider>
   )
 }
