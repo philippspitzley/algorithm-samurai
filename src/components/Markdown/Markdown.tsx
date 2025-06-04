@@ -1,60 +1,32 @@
-import { useEffect, useMemo, useState } from "react"
+import { useAuth } from "@/context/auth/useAuth"
 
-import "./Markdown.css"
-
-import { fromAsyncCodeToHtml } from "@shikijs/markdown-it/async"
-import MarkdownItAsync from "markdown-it-async"
-
-import { useTheme } from "@/context/theme/useTheme"
-import { cn } from "@/lib/utils"
-import { BundledTheme, codeToHtml } from "@/shiki-highlighter/shiki.bundle"
+import MarkdownForm from "./MarkdownForm"
+import MarkdownRender from "./MarkdownRender"
 
 interface Props {
-  markdown: string | undefined
-  className?: string
+  markdown: string | undefined | null
+  isEditing: boolean
+  setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
+  onEdit: (body: object) => void
 }
 
-function Markdown({ markdown, className }: Props) {
-  const [html, setHtml] = useState<string>("")
-  const { theme: appTheme } = useTheme()
+function Markdown({ markdown, onEdit, isEditing, setIsEditing }: Props) {
+  const { user } = useAuth()
 
-  const styles = cn("prose", className)
+  if (!markdown) return
 
-  const SHIKITHEME_MAP: Record<typeof appTheme, BundledTheme> = {
-    light: "catppuccin-latte",
-    dark: "catppuccin-mocha",
+  if (user?.is_superuser && markdown && isEditing) {
+    return (
+      <MarkdownForm
+        defaultValue={markdown}
+        onEdit={onEdit}
+        isEditing={isEditing}
+        setIsEditing={setIsEditing}
+      />
+    )
   }
 
-  const currentShikiTheme = SHIKITHEME_MAP[appTheme]
-
-  const mdParser = useMemo(() => {
-    const instance = MarkdownItAsync({
-      html: true,
-      linkify: true,
-      typographer: true,
-    })
-
-    instance.use(
-      fromAsyncCodeToHtml(codeToHtml, {
-        theme: currentShikiTheme,
-      }),
-    )
-
-    return instance
-  }, [currentShikiTheme])
-
-  useEffect(() => {
-    if (markdown === undefined) return
-
-    const renderMarkdownAsync = async () => {
-      const renderedHtml = await mdParser.renderAsync(markdown)
-      setHtml(renderedHtml)
-    }
-
-    renderMarkdownAsync()
-  }, [markdown, mdParser])
-
-  return <div className={styles} dangerouslySetInnerHTML={{ __html: html }} />
+  return <MarkdownRender markdown={markdown} />
 }
 
 export default Markdown

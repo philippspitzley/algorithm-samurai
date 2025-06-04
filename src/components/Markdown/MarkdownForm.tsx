@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 
-import Markdown from "@/components/Markdown/Markdown"
+import Markdown from "@/components/Markdown/MarkdownRender"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -19,11 +19,13 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 
 interface Props {
-  defaultValue: string | undefined
-  callbackFn: (body: { description: string }) => Promise<void> | void
+  defaultValue: string | undefined | null
+  onEdit: (body: object) => void
+  isEditing?: boolean
+  setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-function MarkdownForm({ defaultValue, callbackFn }: Props) {
+function MarkdownForm({ defaultValue, onEdit, setIsEditing }: Props) {
   const FormSchema = z.object({
     markdown: z.string().min(1, { message: "Provide at least one character!" }),
   })
@@ -49,7 +51,8 @@ function MarkdownForm({ defaultValue, callbackFn }: Props) {
     }
     const body = { description: data.markdown }
 
-    await callbackFn(body)
+    onEdit(body)
+    setIsEditing(false)
   }
 
   return (
