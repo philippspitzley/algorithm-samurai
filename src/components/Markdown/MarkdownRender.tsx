@@ -54,7 +54,13 @@ function Markdown({ markdown: markdown, className }: Props) {
     renderMarkdownAsync()
   }, [markdown, mdParser])
 
-  return <div className={styles} dangerouslySetInnerHTML={{ __html: html }} />
+  return (
+    <div
+      className={styles}
+      // eslint-disable-next-line react-dom/no-dangerously-set-innerhtml
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  )
 }
 
 export default Markdown
