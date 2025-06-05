@@ -1,12 +1,15 @@
-import { X } from "lucide-react"
+import { Award, BadgeCheck, X } from "lucide-react"
 import { Link } from "react-router-dom"
 
 import { APISchemas } from "@/api/types"
 import Markdown from "@/components/Markdown/MarkdownRender"
 import { Card, CardDescription, CardTitle } from "@/components/ui/card"
+import { useAuth } from "@/context/auth/useAuth"
+import { useUserCoursesContext } from "@/context/userCourses/useUserCoursesContext"
 
 import AdminContext from "../Admin/AdminContext"
 import { Button } from "../ui/button"
+import { Progress } from "../ui/progress"
 import UpdateCourseForm from "./UpdateCourseForm"
 import useCourses from "./useCourse"
 
@@ -15,7 +18,14 @@ interface Props {
 }
 
 function Course({ data: course }: Props) {
+  const { isAuthenticated } = useAuth()
   const { updateCourse, deleteCourse } = useCourses({ courseId: course.id })
+  const { isEnrolledInCourse, getCourse } = useUserCoursesContext()
+
+  const isEnrolled = isAuthenticated ? isEnrolledInCourse(course.id) : false
+  const canAccessCourse = isAuthenticated && isEnrolled
+  const userCourse = getCourse(course.id)
+
 
   return (
     <Card key={course.id} className="relative w-full max-w-3xl min-w-xs px-6">
@@ -27,11 +37,15 @@ function Course({ data: course }: Props) {
         </Button>
       </AdminContext>
 
-      <div className="flex justify-between">
+      {canAccessCourse ? (
+        <div className="flex items-center gap-6">
         <Link to={course.id}>
-          <CardTitle className="text-lg">{course.title}</CardTitle>
+            <CardTitle className="cursor-pointer text-lg hover:underline">{course.title}</CardTitle>
         </Link>
       </div>
+      ) : (
+        <CardTitle className="text-lg">{course.title}</CardTitle>
+      )}
 
       {course?.description && (
         <CardDescription className="-mt-4">
@@ -40,6 +54,14 @@ function Course({ data: course }: Props) {
           </div>
         </CardDescription>
       )}
+
+      {!canAccessCourse && isAuthenticated && (
+        <div className="mt-4">
+          <Button className="w-full">Enroll now</Button>
+        </div>
+      )}
+
+      {canAccessCourse && <Progress value={userCourse?.progress} />}
     </Card>
   )
 }
