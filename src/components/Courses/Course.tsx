@@ -8,6 +8,7 @@ import { useAuth } from "@/context/auth/useAuth"
 import { useUserCoursesContext } from "@/context/userCourses/useUserCoursesContext"
 
 import AdminContext from "../Admin/AdminContext"
+import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
 import { Progress } from "../ui/progress"
 import UpdateCourseForm from "./UpdateCourseForm"
@@ -26,10 +27,22 @@ function Course({ data: course }: Props) {
   const canAccessCourse = isAuthenticated && isEnrolled
   const userCourse = getCourse(course.id)
 
+  const StatusBadge = (
+    <Badge variant={"secondary"} className="bg-terminal text-background">
+      <BadgeCheck />
+      {userCourse?.status}
+    </Badge>
+  )
+  const ProgressBadge = (
+    <Badge variant={"secondary"} className="text-background bg-amber-200">
+      <Award />
+      {userCourse?.progress}% complete
+    </Badge>
+  )
 
   return (
-    <Card key={course.id} className="relative w-full max-w-3xl min-w-xs px-6">
-      <AdminContext className="absolute right-6 flex gap-2">
+    <Card key={course.id} className="group relative w-full max-w-3xl min-w-xs px-6">
+      <AdminContext className="absolute right-6 flex gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
         <UpdateCourseForm onSubmit={updateCourse} defaultValues={course} />
         <Button onClick={deleteCourse} variant="destructive" size="icon">
           <span className="sr-only">Delete</span>
@@ -39,19 +52,19 @@ function Course({ data: course }: Props) {
 
       {canAccessCourse ? (
         <div className="flex items-center gap-6">
-        <Link to={course.id}>
+          <Link to={course.id}>
             <CardTitle className="cursor-pointer text-lg hover:underline">{course.title}</CardTitle>
-        </Link>
-      </div>
+          </Link>
+          {StatusBadge}
+          {ProgressBadge}
+        </div>
       ) : (
         <CardTitle className="text-lg">{course.title}</CardTitle>
       )}
 
       {course?.description && (
-        <CardDescription className="-mt-4">
-          <div className="line-clamp-4">
-            <Markdown markdown={course.description} />
-          </div>
+        <CardDescription className="line-clamp-4">
+          <Markdown markdown={course.description} />
         </CardDescription>
       )}
 
