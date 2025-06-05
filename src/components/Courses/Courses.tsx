@@ -1,8 +1,11 @@
+import { Link } from "react-router-dom"
 import { toast } from "sonner"
 
 import LoadingSpinner from "@/components/LoadingSpinner"
+import { useAuth } from "@/context/auth/useAuth"
 
 import AdminContext from "../Admin/AdminContext"
+import { Button } from "../ui/button"
 import { Card } from "../ui/card"
 import Course from "./Course"
 import CreateCourseForm from "./CreateCourseForm"
@@ -10,6 +13,7 @@ import useCourses from "./useCourses"
 
 function Courses() {
   const { data, error, isLoading, isError, createCourse } = useCourses()
+  const { isAuthenticated } = useAuth()
 
   if (isLoading) return <LoadingSpinner />
 
@@ -25,6 +29,15 @@ function Courses() {
           <CreateCourseForm onSubmit={createCourse} />
         </Card>
       </AdminContext>
+
+      {!isAuthenticated && (
+        <div className="mb-6 w-full max-w-3xl min-w-xs">
+          <Button variant="outline" className="w-full" asChild>
+            <Link to="/login">Please log in to enroll</Link>
+          </Button>
+        </div>
+      )}
+
       {courses && <div className="flex flex-col items-center gap-4">{courseElements}</div>}
     </main>
   )
