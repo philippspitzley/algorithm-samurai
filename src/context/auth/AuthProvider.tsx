@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 
+import { useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
+
 import { APISchemas } from "@/api/types"
 
 import { AuthContext } from "./useAuth"
@@ -11,6 +14,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState("")
+  const queryClient = useQueryClient()
 
   const clearErrorMessage = useCallback(() => {
     setErrorMessage("")
@@ -117,17 +121,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         credentials: "include",
       })
       setUser(null)
+
+      // clear query cache
+      queryClient.removeQueries({ queryKey: ["get", "/api/v1/users/me/courses"] })
+
+      toast.success("You logged out successfully.")
     } catch (error) {
-      console.error("Logout failed:", error)
+      toast.error("Logout failed.")
       setErrorMessage(error instanceof Error ? error.message : "Logout failed. Please try again.")
     } finally {
       setLoading(false)
     }
-  }, [clearErrorMessage])
+  }, [clearErrorMessage, queryClient])
 
   const value = useMemo(() => {
     return {
       isAuthenticated: !!user,
+      isAdmin: Boolean(user?.is_superuser),
       user,
       login,
       logout,
