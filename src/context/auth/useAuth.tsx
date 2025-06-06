@@ -4,6 +4,7 @@ import { type User } from "./AuthProvider"
 
 interface AuthContextType {
   isAuthenticated: boolean
+  isAdmin: boolean
   user: User | null
   login: (email: string, password: string) => Promise<boolean>
   logout: () => Promise<void>
