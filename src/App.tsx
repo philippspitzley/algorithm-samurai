@@ -28,9 +28,9 @@ function App() {
   return (
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <UserCoursesProvider>
-            <Router>
+        <Router>
+          <AuthProvider>
+            <UserCoursesProvider>
               <Routes>
                 <Route element={<Layout />}>
                   <Route path="/login" element={<Login />} />
@@ -50,9 +50,9 @@ function App() {
                   <Route path="*" element={<NotFound />} />
                 </Route>
               </Routes>
-            </Router>
-          </UserCoursesProvider>
-        </AuthProvider>
+            </UserCoursesProvider>
+          </AuthProvider>
+        </Router>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </ThemeProvider>
