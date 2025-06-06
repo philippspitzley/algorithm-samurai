@@ -50,7 +50,7 @@ function App() {
             </Routes>
           </Router>
         </AuthProvider>
-        <ReactQueryDevtools />
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </ThemeProvider>
   )
