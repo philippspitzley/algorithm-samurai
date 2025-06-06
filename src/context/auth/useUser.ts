@@ -33,12 +33,6 @@ function useUser() {
   const loginMutation = $api.useMutation("post", "/api/v1/login/access-token")
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    const formData = new URLSearchParams()
-    formData.append("grant_type", "password")
-    formData.append("username", email)
-    formData.append("password", password)
-    formData.append("scope", "")
-
     try {
       await loginMutation.mutateAsync({
         headers: {

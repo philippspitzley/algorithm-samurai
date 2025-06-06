@@ -1,23 +1,14 @@
 import { createContext, use } from "react"
 
-import { APISchemas } from "@/api/types"
+import useUser from "./useUser"
 
-interface AuthContextType {
-  user: APISchemas["UserPublic"] | undefined
-  login: (email: string, password: string) => Promise<boolean>
-  logout: () => void
-  isAuthenticated: boolean
-  isAdmin: boolean
-  isLoading: boolean
-  isError: boolean
-  error: unknown
-}
+type AuthContextType = ReturnType<typeof useUser>
 
 // Context Provider
-export const AuthContext = createContext<AuthContextType | undefined>(undefined)
+export const AuthContext = createContext<AuthContextType | null>(null)
 
 // useContext Hook
-export const useAuth = (): AuthContextType => {
+export const useAuth = () => {
   const context = use(AuthContext)
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider")
