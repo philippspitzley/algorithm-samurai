@@ -1,16 +1,16 @@
 import { createContext, use } from "react"
 
-import { type User } from "./AuthProvider"
+import { APISchemas } from "@/api/types"
 
 interface AuthContextType {
+  user: APISchemas["UserPublic"] | undefined
+  login: (email: string, password: string) => Promise<boolean>
+  logout: () => void
   isAuthenticated: boolean
   isAdmin: boolean
-  user: User | null
-  login: (email: string, password: string) => Promise<boolean>
-  logout: () => Promise<void>
-  loading: boolean
-  errorMessage: string
-  clearErrorMessage: () => void // Optional: for manually clearing errors
+  isLoading: boolean
+  isError: boolean
+  error: unknown
 }
 
 // Context Provider
