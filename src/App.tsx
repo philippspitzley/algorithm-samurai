@@ -13,11 +13,12 @@ import NotFound from "@/pages/NotFound"
 import SignUp from "@/pages/SignUp"
 
 import NewCourseForm from "./components/Admin/NewCourseForm"
+import Chapter from "./components/Chapter/Chapter"
 import Layout from "./components/Layout"
 import ProtectedRoute from "./components/ProtectedRoute"
 import { AuthProvider } from "./context/auth/AuthProvider"
+import { UserCoursesProvider } from "./context/userCourses/UserCoursesProvider"
 import AdminDashboard from "./pages/admin/AdminDashboard"
-import Chapter from "./pages/Chapter"
 import CourseLayout from "./pages/CourseLayout"
 import UserDashboard from "./pages/user/UserDashboard"
 
@@ -28,27 +29,29 @@ function App() {
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <Router>
-            <Routes>
-              <Route element={<Layout />}>
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/" element={<Index />} />
-                <Route path="/courses" element={<Courses />}></Route>
+          <UserCoursesProvider>
+            <Router>
+              <Routes>
+                <Route element={<Layout />}>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/signup" element={<SignUp />} />
+                  <Route path="/" element={<Index />} />
+                  <Route path="/courses" element={<Courses />}></Route>
 
-                <Route element={<ProtectedRoute />}>
-                  <Route path="/admin" element={<AdminDashboard />} />
-                  <Route path="/admin/new-course" element={<NewCourseForm />} />
-                  <Route path="/users/:userId" element={<UserDashboard />} />
-                  <Route element={<CourseLayout />}>
-                    <Route path="/courses/:courseId" element={<Course />} />
-                    <Route path="/courses/:courseId/:chapterId" element={<Chapter />} />
+                  <Route element={<ProtectedRoute />}>
+                    <Route path="/admin" element={<AdminDashboard />} />
+                    <Route path="/admin/new-course" element={<NewCourseForm />} />
+                    <Route path="/users/:userId" element={<UserDashboard />} />
+                    <Route element={<CourseLayout />}>
+                      <Route path="/courses/:courseId" element={<Course />} />
+                      <Route path="/courses/:courseId/:chapterId" element={<Chapter />} />
+                    </Route>
                   </Route>
+                  <Route path="*" element={<NotFound />} />
                 </Route>
-                <Route path="*" element={<NotFound />} />
-              </Route>
-            </Routes>
-          </Router>
+              </Routes>
+            </Router>
+          </UserCoursesProvider>
         </AuthProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
