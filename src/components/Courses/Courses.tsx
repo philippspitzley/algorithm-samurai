@@ -38,7 +38,7 @@ function Courses() {
         </div>
       )}
 
-      {courses && <div className="flex flex-col items-center gap-4">{courseElements}</div>}
+      {courses && <div className="flex flex-wrap items-center gap-4">{courseElements}</div>}
     </main>
   )
 }
