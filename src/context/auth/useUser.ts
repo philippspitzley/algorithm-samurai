@@ -1,6 +1,7 @@
 import { useState } from "react"
 
 import { useQueryClient } from "@tanstack/react-query"
+import { useLocation, useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 
 import { $api } from "@/api/api"
@@ -8,6 +9,9 @@ import { $api } from "@/api/api"
 function useUser() {
   const queryClient = useQueryClient()
   const [isAuthenticated, setIsAuthenticated] = useState(true)
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const {
     data: user,
     isLoading: isUserLoading,
@@ -44,6 +48,12 @@ function useUser() {
       // onSuccess
       setIsAuthenticated(true)
       toast.success("Login successful!")
+
+      // -- navigate to previous url
+      const searchParams = new URLSearchParams(location.search)
+      const returnTo = searchParams.get("returnTo") || "/"
+      navigate(returnTo)
+
       return true
     } catch (error) {
       // onError
@@ -68,10 +78,20 @@ function useUser() {
 
   const logout = () => logoutMutation.mutate({})
 
+  const goToLogin = (returnToCurrentPage = true) => {
+    const returnPath = returnToCurrentPage ? location.pathname : undefined
+    if (returnPath) {
+      navigate(`/login?returnTo=${returnPath}`)
+    } else {
+      navigate("/login")
+    }
+  }
+
   return {
     user,
     login,
     logout,
+    goToLogin,
     isAuthenticated: !!user,
     isAdmin: Boolean(user?.is_superuser),
     isLoading: isUserLoading || loginMutation.isPending,
