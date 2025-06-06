@@ -41,7 +41,7 @@ function Course({ data: course }: Props) {
   )
 
   return (
-    <Card key={course.id} className="group relative w-full max-w-3xl min-w-xs px-6">
+    <Card key={course.id} className="group relative max-w-3xl min-w-xs flex-1 basis-sm px-6">
       <AdminContext className="absolute right-6 flex gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
         <UpdateCourseForm onSubmit={updateCourse} defaultValues={course} />
         <Button onClick={deleteCourse} variant="destructive" size="icon">
@@ -51,12 +51,14 @@ function Course({ data: course }: Props) {
       </AdminContext>
 
       {canAccessCourse ? (
-        <div className="flex items-center gap-6">
+        <div className="flex flex-wrap items-center gap-6">
           <Link to={course.id}>
             <CardTitle className="cursor-pointer text-lg hover:underline">{course.title}</CardTitle>
           </Link>
-          {StatusBadge}
-          {ProgressBadge}
+          <div className="flex flex-99999 gap-2">
+            {StatusBadge}
+            {ProgressBadge}
+          </div>
         </div>
       ) : (
         <CardTitle className="text-lg">{course.title}</CardTitle>
