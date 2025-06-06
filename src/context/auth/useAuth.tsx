@@ -10,7 +10,7 @@ export const AuthContext = createContext<AuthContextType | null>(null)
 // useContext Hook
 export const useAuth = () => {
   const context = use(AuthContext)
-  if (context === undefined) {
+  if (context === null) {
     throw new Error("useAuth must be used within an AuthProvider")
   }
   return context
