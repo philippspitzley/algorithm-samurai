@@ -7,10 +7,10 @@ interface Props {
 }
 
 function AdminEditButtons({ className, children }: Props) {
-  const { user } = useAuth()
+  const { isAdmin } = useAuth()
   const styles = cn("flex gap-2", className)
 
-  if (!user || !user.is_superuser) return null
+  if (!isAdmin) return null
 
   return <div className={styles}>{children}</div>
 }
