@@ -69,9 +69,7 @@ export function SignUpForm() {
 
   const isSubmitting = signUpMutation.isPending
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
-
+  function onSubmit(values: z.infer<typeof formSchema>) {
     signUpMutation.mutate({
       body: {
         email: values.email,
