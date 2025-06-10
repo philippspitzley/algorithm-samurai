@@ -12,7 +12,6 @@ import Login from "@/pages/Login"
 import NotFound from "@/pages/NotFound"
 import SignUp from "@/pages/SignUp"
 
-import NewCourseForm from "./components/Admin/NewCourseForm"
 import Chapter from "./components/Chapter/Chapter"
 import Layout from "./components/Layout"
 import ProtectedRoute from "./components/ProtectedRoute"
@@ -40,8 +39,9 @@ function App() {
 
                   <Route element={<ProtectedRoute />}>
                     <Route path="/admin" element={<AdminDashboard />} />
-                    <Route path="/admin/new-course" element={<NewCourseForm />} />
+
                     <Route path="/users/:userId" element={<UserDashboard />} />
+
                     <Route element={<CourseLayout />}>
                       <Route path="/courses/:courseId" element={<Course />} />
                       <Route path="/courses/:courseId/:chapterId" element={<Chapter />} />
