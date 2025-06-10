@@ -5,15 +5,15 @@ import { Navigate, Outlet, useLocation } from "react-router-dom"
 import { useAuth } from "../context/auth/useAuth"
 
 const ProtectedRoute: React.FC = () => {
-  const { isAuthenticated, loading } = useAuth()
+  const { isAuthenticated, isLoading } = useAuth()
   const location = useLocation()
 
-  if (loading) {
+  if (isLoading) {
     return <div>Loading...</div>
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />
+    return <Navigate to={`/login?returnTo=${encodeURIComponent(location.pathname)}`} />
   }
 
   return <Outlet />
