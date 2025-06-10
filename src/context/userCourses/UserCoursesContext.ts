@@ -10,7 +10,8 @@ interface UserCoursesContextType {
   } | null
   isLoading: boolean
   isError: boolean
-  isEnrolledInCourse: (courseId: string) => boolean
+  isEnrolled: (courseId: string) => boolean
+  enrollCourse: (courseId: string) => void
   getCourse: (courseId: string) => APISchemas["UserCoursePublic"] | undefined
 }
 
