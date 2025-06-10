@@ -1,50 +1,31 @@
-import { useEffect, useState } from "react"
-
 import { Outlet, useParams } from "react-router-dom"
 
-import { ApiError, getData } from "@/api/fetch"
-import { getUrl } from "@/api/url-constants"
-import AlertDestructive from "@/components/AlertDestructive"
-import ChapterSidebar from "@/components/ChapterSidebar"
+import { $api } from "@/api/api"
+import ChapterSidebar from "@/components/Chapter/ChapterSidebar"
+import LoadingSpinner from "@/components/LoadingSpinner"
 
-import Course from "./Course"
 import NotFound from "./NotFound"
 
 function CourseLayout() {
   const { courseId } = useParams()
-  const [notFound, setNotFound] = useState<boolean>(false)
-  const [course, setCourse] = useState<Course | null>(null)
-  const [errorMessage, setErrorMessage] = useState<string>("")
 
-  useEffect(() => {
-    async function getCourse() {
-      try {
-        const courseUrl = `${getUrl("courses")}/${courseId}`
-        const course: Course = await getData(courseUrl)
+  const { data, isLoading, isError } = $api.useQuery("get", "/api/v1/courses/{course_id}", {
+    params: { path: { course_id: courseId! } },
+    enabled: !!courseId,
+  })
 
-        if (!course) {
-          setNotFound(true)
-        } else {
-          setCourse(course)
-        }
-      } catch (error: any) {
-        setNotFound(true)
-        const apiError = error as ApiError
-        setErrorMessage(apiError.message)
-        console.error(`${apiError.status} (${apiError.statusText})\n${apiError.message}`)
-      }
-    }
+  if (isLoading) {
+    return <LoadingSpinner />
+  }
 
-    getCourse()
-  }, [courseId])
-
-  if (notFound) {
+  if (isError) {
     return <NotFound />
   }
 
+  const course = data
+
   return (
     <>
-      {errorMessage && <AlertDestructive message={errorMessage} />}
       <div className="bg-background/90 flex gap-6 rounded-xl border-1 p-8 backdrop-blur-lg">
         <ChapterSidebar courseId={course?.id} title={course?.title} />
         <Outlet />
