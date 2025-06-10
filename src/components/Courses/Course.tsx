@@ -5,7 +5,7 @@ import { APISchemas } from "@/api/types"
 import Markdown from "@/components/Markdown/MarkdownRender"
 import { Card, CardDescription, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/context/auth/useAuth"
-import { useUserCoursesContext } from "@/context/userCourses/useUserCoursesContext"
+import { useUserCoursesContext } from "@/context/userCourses/UserCoursesContext"
 
 import AdminContext from "../Admin/AdminContext"
 import { Badge } from "../ui/badge"
