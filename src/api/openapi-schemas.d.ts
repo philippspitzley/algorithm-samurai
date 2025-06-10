@@ -1290,9 +1290,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json":
-            | components["schemas"]["UserCoursePublic"]
-            | components["schemas"]["UserCoursePublic"][]
+          "application/json": components["schemas"]["UserCoursePublic"][]
         }
       }
       /** @description Validation Error */
