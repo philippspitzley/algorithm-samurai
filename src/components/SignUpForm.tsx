@@ -21,13 +21,15 @@ import { Input } from "@/components/ui/input"
 import AlertDestructive from "./AlertDestructive"
 import { Card, CardTitle } from "./ui/card"
 
-const formSchema = z.object({
+const formSchema = z
+  .object({
   email: z.string().email({
     message: "Your email is invalid.",
   }),
   password: z.string().min(8, {
     message: "Password must be at least 8 characters.",
   }),
+    confirmPassword: z.string(),
   user_name: z
     .string()
     .min(1, {
@@ -37,6 +39,10 @@ const formSchema = z.object({
       message: "Your name can not be longer than 20 characters.",
     }),
 })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  })
 
 export function SignUpForm() {
   const [errorMessage, setErrorMessage] = useState("")
@@ -47,6 +53,7 @@ export function SignUpForm() {
     defaultValues: {
       email: "",
       password: "",
+      confirmPassword: "",
       user_name: "",
     },
   })
@@ -145,7 +152,26 @@ export function SignUpForm() {
                     <FormLabel>Password</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="L2sGdVW9WbvQ6S"
+                        placeholder="Enter your password"
+                        type="password"
+                        {...field}
+                        disabled={isSubmitting}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter your password"
                         type="password"
                         {...field}
                         disabled={isSubmitting}
