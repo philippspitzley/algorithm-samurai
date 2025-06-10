@@ -11,7 +11,7 @@ function useUserCourses() {
     {},
     {
       enabled: isAuthenticated, // Only run if authenticated
-      staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+      staleTime: Infinity, // Cache indefinitely
       refetchOnWindowFocus: false, // Prevent excessive refetching
     },
   )
