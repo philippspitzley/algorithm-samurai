@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react"
-
 import { zodResolver } from "@hookform/resolvers/zod"
 import { LoaderCircle } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -18,7 +16,6 @@ import {
 import { Input } from "@/components/ui/input"
 
 import { useAuth } from "../context/auth/useAuth"
-import AlertDestructive from "./AlertDestructive"
 import { Card, CardTitle } from "./ui/card"
 
 const formSchema = z.object({
@@ -30,19 +27,10 @@ const formSchema = z.object({
   }),
 })
 
-interface LocationState {
-  from?: {
-    pathname?: string
-  }
-}
-
 export function LoginForm() {
-  const [errorMessage, setErrorMessage] = useState("")
-  const [showAlert, setShowAlert] = useState(false)
   const authContext = useAuth()
   const navigate = useNavigate()
-  const from: string =
-    (useLocation().state as LocationState)?.from?.pathname || "/"
+  const location = useLocation()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -54,45 +42,23 @@ export function LoginForm() {
 
   const { isSubmitting } = form.formState
 
-  useEffect(() => {
-    if (authContext.errorMessage) {
-      setShowAlert(true)
-      const timer = setTimeout(() => {
-        setShowAlert(false)
-      }, 5000)
-      return () => clearTimeout(timer)
-    }
-  }, [authContext.errorMessage])
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const isLoggedIn = await authContext.login(values.email, values.password)
-    if (authContext.errorMessage) {
-      setErrorMessage(authContext.errorMessage)
-    }
 
     if (isLoggedIn) {
-      navigate(from, { replace: true })
+      const searchParams = new URLSearchParams(location.search)
+
+      const returnTo = searchParams.get("returnTo") || "/"
+      navigate(returnTo)
     }
   }
 
   return (
     <div className="flex flex-col">
-      {errorMessage && showAlert ? (
-        <div className="bg-background mb-4 rounded-md border p-4 shadow-lg">
-          <AlertDestructive message={authContext.errorMessage.slice(2)} />
-          <div className="mt-2 h-0.5 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700">
-            <div className="animate-scale-x-progress h-0.5 origin-left rounded-full bg-red-600 dark:bg-red-500"></div>
-          </div>
-        </div>
-      ) : (
-        <div className="h-32"></div>
-      )}
       <Card className="w-lg px-6">
         <header>
           <CardTitle className="text-2xl font-semibold">Login</CardTitle>
-          <p className="text-muted-foreground text-sm">
-            Login with your Apple or Google account
-          </p>
+          <p className="text-muted-foreground text-sm">Login with your Apple or Google account</p>
         </header>
         <Button variant="default" disabled={isSubmitting}>
           <svg
@@ -121,9 +87,7 @@ export function LoginForm() {
           Login with Apple
         </Button>
         <div className="after:border-border relative mt-4 mb-1 text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-          <span className="bg-card text-muted-foreground relative z-10 px-2">
-            Or continue with
-          </span>
+          <span className="bg-card text-muted-foreground relative z-10 px-2">Or continue with</span>
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -135,11 +99,7 @@ export function LoginForm() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="user@example.com"
-                        {...field}
-                        disabled={isSubmitting}
-                      />
+                      <Input placeholder="user@example.com" {...field} disabled={isSubmitting} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -174,16 +134,8 @@ export function LoginForm() {
               />
             </div>
 
-            <Button
-              type="submit"
-              className={`$ mb-2 w-full`}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <LoaderCircle className="animate-spin" />
-              ) : (
-                "Login"
-              )}
+            <Button type="submit" className={`$ mb-2 w-full`} disabled={isSubmitting}>
+              {isSubmitting ? <LoaderCircle className="animate-spin" /> : "Login"}
             </Button>
 
             <div className="text-center text-sm">
