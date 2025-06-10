@@ -24,8 +24,8 @@ function Courses() {
 
   return (
     <main className="mt-8 flex flex-col items-center px-4">
-      <AdminContext className="mb-6 w-full max-w-3xl min-w-xs">
-        <Card className="w-full max-w-3xl min-w-xs px-6">
+      <AdminContext className="mb-6 w-full min-w-xs">
+        <Card className="w-full min-w-xs px-6">
           <CreateCourseForm onSubmit={createCourse} />
         </Card>
       </AdminContext>
