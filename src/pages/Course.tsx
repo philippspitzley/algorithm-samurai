@@ -1,51 +1,31 @@
-import { useEffect, useState } from "react"
-
 import { useParams } from "react-router-dom"
 
-import { ApiError, getData } from "@/api/fetch"
-import { getUrl } from "@/api/url-constants"
-import AlertDestructive from "@/components/AlertDestructive"
+import { $api } from "@/api/api"
+import LoadingSpinner from "@/components/LoadingSpinner"
 import NotFound from "@/pages/NotFound"
 import { type Course } from "@/types/api"
 
 function Course() {
   const { courseId } = useParams()
-  const [notFound, setNotFound] = useState<boolean>(false)
-  const [course, setCourse] = useState<Course | null>(null)
-  const [errorMessage, setErrorMessage] = useState<string>("")
 
-  useEffect(() => {
-    async function getCourse() {
-      const courseUrl = `${getUrl("courses")}/${courseId}`
-      const course: Course = await getData(courseUrl)
-      setCourse(course)
-      return course
-    }
+  const { data, isLoading, isError } = $api.useQuery("get", "/api/v1/courses/{course_id}", {
+    params: { path: { course_id: courseId! } },
 
-    async function getCourseData() {
-      try {
-        const course = await getCourse()
-        if (!course) {
-          setNotFound(true)
-        }
-      } catch (error: any) {
-        setNotFound(true)
-        const apiError = error as ApiError
-        setErrorMessage(apiError.message)
-        console.error(`${apiError.status} (${apiError.statusText})\n${apiError.message}`)
-      }
-    }
+    enabled: !!courseId,
+  })
 
-    getCourseData()
-  }, [courseId])
+  if (isLoading) {
+    return <LoadingSpinner />
+  }
 
-  if (notFound) {
+  if (isError) {
     return <NotFound />
   }
 
+  const course = data
+
   return (
     <div className="flex gap-6">
-      {errorMessage && <AlertDestructive message={errorMessage} />}
       <div className="max-w-4xl">
         <h2 className="text-2xl">{course?.title}</h2>
         <p>{course?.description}</p>
