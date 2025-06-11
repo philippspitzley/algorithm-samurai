@@ -455,14 +455,12 @@ export interface paths {
     }
     /**
      * Get Chapter Points
-     * @deprecated
      * @description Get chapter points.
      */
     get: operations["chapter_points-get_chapter_points"]
     put?: never
     /**
      * Create Chapter Point
-     * @deprecated
      * @description Create new chapter point.
      */
     post: operations["chapter_points-create_chapter_point"]
@@ -481,7 +479,6 @@ export interface paths {
     }
     /**
      * Get Chapter
-     * @deprecated
      * @description Get chapter point by ID
      */
     get: operations["chapter_points-get_chapter"]
@@ -489,7 +486,6 @@ export interface paths {
     post?: never
     /**
      * Delete Chapter Point
-     * @deprecated
      * @description Delete Chapter Point.
      */
     delete: operations["chapter_points-delete_chapter_point"]
@@ -497,7 +493,6 @@ export interface paths {
     head?: never
     /**
      * Update Chapter Point
-     * @deprecated
      * @description Update chapter point.
      */
     patch: operations["chapter_points-update_chapter_point"]
@@ -572,6 +567,8 @@ export interface components {
       description?: string | null
       /** Exercise */
       exercise?: string | null
+      /** Test Code */
+      test_code?: string | null
     }
     /** ChapterPointCreate */
     ChapterPointCreate: {
@@ -639,6 +636,8 @@ export interface components {
       description?: string | null
       /** Exercise */
       exercise?: string | null
+      /** Test Code */
+      test_code?: string | null
       /**
        * Id
        * Format: uuid
@@ -662,6 +661,8 @@ export interface components {
       description?: string | null
       /** Exercise */
       exercise?: string | null
+      /** Test Code */
+      test_code?: string | null
     }
     /** ChaptersPublic */
     ChaptersPublic: {
