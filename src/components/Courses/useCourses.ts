@@ -10,7 +10,9 @@ function useCourses() {
   const queryClient = useQueryClient()
   const isLoading = useIsFetching()
 
-  const { data, error, isError } = $api.useQuery("get", "/api/v1/courses/")
+  const { data, error, isError } = $api.useQuery("get", "/api/v1/courses/", {
+    params: { query: { include_chapters: false } },
+  })
 
   const { mutate: create } = $api.useMutation("post", "/api/v1/courses/", {
     onSuccess: () => {
@@ -21,6 +23,8 @@ function useCourses() {
       })
     },
     onError: (error) => {
+      // FIXME: add detail props to the error type
+      // @ts-expect-error detail is not defined in the type
       toast.error("Something went wrong.", { description: error.detail.message })
       console.error(error)
     },
