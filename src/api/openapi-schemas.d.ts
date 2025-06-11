@@ -1747,6 +1747,7 @@ export interface operations {
     parameters: {
       query?: {
         include_chapter_points?: boolean
+        include_count?: boolean
       }
       header?: never
       path: {
@@ -1762,7 +1763,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["ChapterPublic"][]
+          "application/json": components["schemas"]["ChaptersPublic"]
         }
       }
       /** @description Validation Error */
