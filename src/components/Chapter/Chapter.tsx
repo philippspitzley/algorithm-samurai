@@ -4,8 +4,8 @@ import { useParams } from "react-router-dom"
 
 import AdminEditButtons from "@/components/Admin/AdminEditButtons"
 import CodeEditor from "@/components/CodeElements/CodeEditor"
+import NotFound from "@/pages/NotFound"
 
-import AlertDestructive from "../AlertDestructive"
 import LoadingSpinner from "../LoadingSpinner"
 import Markdown from "../Markdown/Markdown"
 import useChapter from "./useChapter"
@@ -15,14 +15,14 @@ function Chapter() {
   const [adminIsEditing, setAdminIsEditing] = useState(false)
 
   const { data, isLoading, isError, updateChapter, deleteChapter } = useChapter({
-    chapterId: chapterId!, // force TS to treat chapterID as string and not as string | undefined
+    chapterId: chapterId!,
   })
 
   if (isLoading) return <LoadingSpinner />
 
   if (isError) {
     return (
-      <AlertDestructive
+      <NotFound
         title="Chapter not found"
         message={"Sorry something went wrong. The chapter you are looking for does not exist."}
       />
@@ -37,7 +37,7 @@ function Chapter() {
   }
 
   return (
-    <div className="relative flex flex-col gap-4">
+    <div className="relative flex flex-6 flex-col gap-4">
       <h1>{chapterData.title}</h1>
       <AdminEditButtons
         isEditing={adminIsEditing}
