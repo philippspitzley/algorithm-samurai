@@ -8,6 +8,7 @@ import NotFound from "@/pages/NotFound"
 
 import LoadingSpinner from "../LoadingSpinner"
 import Markdown from "../Markdown/Markdown"
+import UpdateChapterForm from "./UpdateChapterForm"
 import useChapters from "./useChapters"
 
 function Chapter() {
@@ -39,6 +40,7 @@ function Chapter() {
   return (
     <div className="relative flex flex-6 flex-col gap-4">
       <h1 className="text-3xl">{chapter.title}</h1>
+      <UpdateChapterForm onSubmit={updateChapter} defaultValues={chapter} />
       <AdminEditButtons
         isEditing={adminIsEditing}
         onEdit={toggleEdit}
