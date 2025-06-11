@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 
 import { APISchemas } from "@/api/types"
 import Markdown from "@/components/Markdown/MarkdownRender"
-import { Card, CardDescription, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/context/auth/useAuth"
 import { useUserCoursesContext } from "@/context/userCourses/UserCoursesContext"
 
@@ -21,11 +21,11 @@ interface Props {
 function Course({ data: course }: Props) {
   const { isAuthenticated } = useAuth()
   const { updateCourse, deleteCourse } = useCourses({ courseId: course.id })
-  const { isEnrolledInCourse, getCourse } = useUserCoursesContext()
-
-  const isEnrolled = isAuthenticated ? isEnrolledInCourse(course.id) : false
-  const canAccessCourse = isAuthenticated && isEnrolled
+  const { isEnrolled, enrollCourse, getCourse } = useUserCoursesContext()
   const userCourse = getCourse(course.id)
+
+  const courseEnrolled = isAuthenticated ? isEnrolled(course.id) : false
+  const canAccessCourse = isAuthenticated && courseEnrolled
 
   const StatusBadge = (
     <Badge variant={"secondary"} className="bg-terminal text-background">
@@ -41,7 +41,7 @@ function Course({ data: course }: Props) {
   )
 
   return (
-    <Card key={course.id} className="group relative max-w-3xl min-w-xs flex-1 basis-sm px-6">
+    <Card key={course.id} className="group @container relative h-68 min-w-xs flex-1 basis-sm">
       <AdminContext className="absolute right-6 flex gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
         <UpdateCourseForm onSubmit={updateCourse} defaultValues={course} />
         <Button onClick={deleteCourse} variant="destructive" size="icon">
@@ -50,33 +50,38 @@ function Course({ data: course }: Props) {
         </Button>
       </AdminContext>
 
-      {canAccessCourse ? (
-        <div className="flex flex-wrap items-center gap-6">
-          <Link to={course.id}>
-            <CardTitle className="cursor-pointer text-lg hover:underline">{course.title}</CardTitle>
-          </Link>
-          <div className="flex flex-99999 gap-2">
-            {StatusBadge}
-            {ProgressBadge}
-          </div>
-        </div>
-      ) : (
-        <CardTitle className="text-lg">{course.title}</CardTitle>
-      )}
+      <CardHeader className="flex flex-col gap-4 @lg:flex-row @lg:items-center">
+        {canAccessCourse ? (
+          <>
+            <Link to={course.id} className="flex-1 cursor-pointer hover:underline">
+              <CardTitle className="text-2xl">{course.title}</CardTitle>
+            </Link>
+
+            <div className="flex gap-2">
+              {StatusBadge}
+              {ProgressBadge}
+            </div>
+          </>
+        ) : (
+          <CardTitle className="text-2xl">{course.title}</CardTitle>
+        )}
+      </CardHeader>
 
       {course?.description && (
-        <CardDescription className="line-clamp-4">
+        <CardContent className="text-foreground/60 relative overflow-hidden">
           <Markdown markdown={course.description} />
-        </CardDescription>
+          <div className="via-card from-card pointer-events-none absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t to-transparent" />
+        </CardContent>
       )}
 
-      {!canAccessCourse && isAuthenticated && (
-        <div className="mt-4">
-          <Button className="w-full">Enroll now</Button>
-        </div>
-      )}
-
-      {canAccessCourse && <Progress value={userCourse?.progress} />}
+      <CardFooter>
+        {!canAccessCourse && isAuthenticated && (
+          <Button onClick={() => enrollCourse(course.id)} className="w-full">
+            Enroll now
+          </Button>
+        )}
+        {canAccessCourse && <Progress value={userCourse?.progress} />}
+      </CardFooter>
     </Card>
   )
 }
