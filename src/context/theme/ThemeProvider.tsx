@@ -1,10 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 
-import {
-  resolveTheme,
-  Theme,
-  ThemeProviderContext,
-} from "@/context/theme/useTheme"
+import { resolveTheme, Theme, ThemeProviderContext } from "@/context/theme/useTheme"
 
 type ThemeProviderProps = {
   children: React.ReactNode
@@ -24,9 +20,7 @@ export function ThemeProvider({
     const stored = localStorage.getItem(storageKey)
     const validThemes: Theme[] = ["dark", "light", "system"]
 
-    return stored && validThemes.includes(stored as Theme)
-      ? (stored as Theme)
-      : defaultTheme
+    return stored && validThemes.includes(stored as Theme) ? (stored as Theme) : defaultTheme
   }
 
   // function resolveTheme(theme: Theme): "dark" | "light" {
