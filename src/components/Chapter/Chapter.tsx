@@ -8,14 +8,14 @@ import NotFound from "@/pages/NotFound"
 
 import LoadingSpinner from "../LoadingSpinner"
 import Markdown from "../Markdown/Markdown"
-import useChapter from "./useChapter"
+import useChapters from "./useChapters"
 
 function Chapter() {
-  const { chapterId } = useParams()
+  const { chapterId, courseId } = useParams()
   const [adminIsEditing, setAdminIsEditing] = useState(false)
-
-  const { data, isLoading, isError, updateChapter, deleteChapter } = useChapter({
+  const { data, isLoading, isError, updateChapter, deleteChapter } = useChapters({
     chapterId: chapterId!,
+    courseId: courseId!,
   })
 
   if (isLoading) return <LoadingSpinner />
@@ -29,8 +29,8 @@ function Chapter() {
     )
   }
 
-  const chapterData = data
-  if (!chapterData) return
+  const chapter = data?.data?.find((chapter) => chapter.id === chapterId)
+  if (!chapter) return
 
   const toggleEdit = () => {
     setAdminIsEditing((prev) => !prev)
@@ -38,7 +38,7 @@ function Chapter() {
 
   return (
     <div className="relative flex flex-6 flex-col gap-4">
-      <h1>{chapterData.title}</h1>
+      <h1 className="text-3xl">{chapter.title}</h1>
       <AdminEditButtons
         isEditing={adminIsEditing}
         onEdit={toggleEdit}
@@ -47,13 +47,13 @@ function Chapter() {
       />
 
       <Markdown
-        markdown={chapterData.description}
+        markdown={chapter.description}
         onEdit={updateChapter}
         isEditing={adminIsEditing}
         setIsEditing={setAdminIsEditing}
       />
 
-      {chapterData.exercise && <CodeEditor defaultValue={chapterData.exercise} />}
+      {chapter.exercise && <CodeEditor defaultValue={chapter.exercise} />}
     </div>
   )
 }
