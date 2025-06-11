@@ -1,11 +1,10 @@
-import { Link } from "react-router-dom"
 import { toast } from "sonner"
 
 import LoadingSpinner from "@/components/LoadingSpinner"
 import { useAuth } from "@/context/auth/useAuth"
 
 import AdminContext from "../Admin/AdminContext"
-import { Button } from "../ui/button"
+import LoginButton from "../LoginButton"
 import { Card } from "../ui/card"
 import Course from "./Course"
 import CreateCourseForm from "./CreateCourseForm"
@@ -31,11 +30,7 @@ function Courses() {
       </AdminContext>
 
       {!isAuthenticated && (
-        <div className="mb-6 w-full max-w-3xl min-w-xs">
-          <Button variant="outline" className="w-full" asChild>
-            <Link to="/login">Please log in to enroll</Link>
-          </Button>
-        </div>
+        <LoginButton className="mb-4 w-full">Please log in to enroll</LoginButton>
       )}
 
       {courses && <div className="flex flex-wrap items-center gap-4">{courseElements}</div>}
