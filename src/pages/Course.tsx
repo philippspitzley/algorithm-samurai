@@ -9,7 +9,7 @@ function Course() {
   const { courseId } = useParams()
 
   const { data, isLoading, isError } = $api.useQuery("get", "/api/v1/courses/{course_id}", {
-    params: { path: { course_id: courseId! } },
+    params: { path: { course_id: courseId! }, query: { include_chapters: false } },
 
     enabled: !!courseId,
   })
