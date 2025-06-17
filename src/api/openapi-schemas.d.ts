@@ -515,6 +515,63 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/piston/execute": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Execute Code */
+    post: operations["piston_api-execute_code"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/ai/generate": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Get Hint
+     * @description Generate a contextual hint for a coding exercise.
+     */
+    post: operations["AI-get_hint"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/ai/health": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Health Check
+     * @description Simple health check for the hints service.
+     */
+    get: operations["AI-health_check"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/private/users/": {
     parameters: {
       query?: never
@@ -671,6 +728,84 @@ export interface components {
       /** Count */
       count?: number | null
     }
+    /** Code */
+    Code: {
+      /** Signal */
+      signal?: string | null
+      /**
+       * Stdout
+       * @default
+       */
+      stdout: string
+      /**
+       * Stderr
+       * @default
+       */
+      stderr: string
+      /**
+       * Code
+       * @default 0
+       */
+      code: number
+      /**
+       * Output
+       * @default
+       */
+      output: string
+      /**
+       * Memory
+       * @default 0
+       */
+      memory: number
+      /** Message */
+      message?: string | null
+      /** Status */
+      status?: string | null
+      /**
+       * Cpu Time
+       * @default 0
+       */
+      cpu_time: number
+      /**
+       * Wall Time
+       * @default 0
+       */
+      wall_time: number
+    }
+    /** CodeError */
+    CodeError: {
+      /** Type */
+      type?: string | null
+      /** Status Code */
+      status_code?: number | null
+      /** Message */
+      message?: string | null
+      /** Error Snippet */
+      error_snippet?: string | null
+      /** Pointer */
+      pointer?: string | null
+      /** Location */
+      location?: string | null
+      /** Line */
+      line?: string | null
+      /** Column */
+      column?: string | null
+    }
+    /** CodeRequest */
+    CodeRequest: {
+      /** Language */
+      language: string
+      /** Version */
+      version: string
+      /** Files */
+      files: components["schemas"]["Files"][]
+    }
+    /** CodeResponse */
+    CodeResponse: {
+      compile?: components["schemas"]["Code"] | null
+      run?: components["schemas"]["Code"] | null
+      error?: components["schemas"]["CodeError"] | null
+    }
     /** CourseCreate */
     CourseCreate: {
       /** Title */
@@ -711,10 +846,55 @@ export interface components {
       /** Count */
       count?: number | null
     }
+    /**
+     * Difficulty
+     * @enum {string}
+     */
+    Difficulty: "beginner" | "intermediate" | "advanced"
+    /** Files */
+    Files: {
+      /** Name */
+      name: string
+      /** Content */
+      content: string
+    }
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
       detail?: components["schemas"]["ValidationError"][]
+    }
+    /** HintRequest */
+    HintRequest: {
+      /** User Code */
+      user_code: string
+      /** Exercise Description */
+      exercise_description: string
+      /** Test Cases */
+      test_cases: string
+      /** Error */
+      error?: string | null
+      /** @default beginner */
+      difficulty_level: components["schemas"]["Difficulty"]
+      /**
+       * Previous Hints
+       * @default []
+       */
+      previous_hints: string[]
+    }
+    /** HintResponse */
+    HintResponse: {
+      /** Hint */
+      hint: string
+      /** Explanation */
+      explanation: string
+      /** Code Snippet */
+      code_snippet?: string | null
+      /** Next Steps */
+      next_steps: string[]
+      /** Confidence Score */
+      confidence_score: number
+      /** Detected Issue Type */
+      detected_issue_type?: string | null
     }
     /**
      * Message
@@ -2259,6 +2439,92 @@ export interface operations {
         }
         content: {
           "application/json": string
+        }
+      }
+    }
+  }
+  "piston_api-execute_code": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CodeRequest"]
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CodeResponse"]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  "AI-get_hint": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["HintRequest"]
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["HintResponse"]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  "AI-health_check": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
         }
       }
     }
