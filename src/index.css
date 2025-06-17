@@ -15,6 +15,7 @@
   /* custom variables */
   --font-family-custom: var(--font-custom);
   --color-terminal: var(--terminal);
+  --color-terminal-error: var(--terminal-error);
   /* shadcn variables */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -57,9 +58,10 @@
   /* custom variables */
   --font-custom: "SamuraiBlast", system-ui, sans-serif;
   --terminal: #1d283d;
+  --terminal-error: #4d0016;
   /* shadcn variables */
   --radius: 0.325rem;
-  --background: #eff1f5 /*oklch(1 0 0)*/;
+  --background: #ffffff /*oklch(1 0 0)*/;
   --foreground: oklch(0.129 0.042 264.695);
   --card: #eff1f5 /*oklch(1 0 0)*/;
   --card-foreground: oklch(0.129 0.042 264.695);
@@ -95,6 +97,7 @@
 .dark {
   /* custom variables */
   --terminal: #a6e3a1;
+  --terminal-error: #f38ba8;
   /* shadcn variables */
   --background: #1e1e2e /*oklch(0.129 0.042 264.695)*/;
   --foreground: oklch(0.984 0.003 247.858);
@@ -134,7 +137,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground bg-white;
   }
   .font-samurai {
     font-family: var(--font-custom);
