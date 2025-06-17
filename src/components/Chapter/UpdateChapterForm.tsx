@@ -37,16 +37,12 @@ const FormSchema = z.object({
     .max(255, {
       message: "That's a great title! Could you keep it under 255 characters to make it snappy?",
     }),
-  description: z
-    .string()
-    .min(1, {
-      message: "Help learners understand what they'll discover - add a brief description!",
-    })
-    .max(500, {
-      message: "Love the detail! Let's keep the description under 500 characters to stay focused.",
-    }),
+  description: z.string().min(1, {
+    message: "Help learners understand what they'll discover - add a brief description!",
+  }),
   chapter_num: z.coerce.number().min(1, { message: "Chapter number must be at least 1." }),
   exercise: z.string().optional(),
+  test_code: z.string().optional(),
 })
 
 type ChapterUpdate = APISchemas["ChapterUpdate"]
@@ -63,6 +59,7 @@ function UpdateChapterForm({ onSubmit: updateChapter, defaultValues: chapter }: 
       description: chapter.description ?? "",
       chapter_num: chapter.chapter_num ?? 1,
       exercise: chapter.exercise ?? "",
+      test_code: chapter.test_code ?? "",
     }
   }, [chapter])
 
@@ -125,9 +122,9 @@ function UpdateChapterForm({ onSubmit: updateChapter, defaultValues: chapter }: 
                   <FormDescription>A short description of the course content.</FormDescription>
                   <FormControl>
                     <Textarea
+                      className="max-h-60"
                       disabled={form.formState.isSubmitting}
                       placeholder="This new course teaches about ..."
-                      className="max-h-[60vh] resize-none"
                       {...field}
                     />
                   </FormControl>
@@ -164,10 +161,29 @@ function UpdateChapterForm({ onSubmit: updateChapter, defaultValues: chapter }: 
                   <FormLabel>Exercise</FormLabel>
                   <FormDescription>The exercise code.</FormDescription>
                   <FormControl>
-                    <Input
-                      type="text"
+                    <Textarea
+                      className="max-h-60"
                       disabled={form.formState.isSubmitting}
                       placeholder="Enter exercise code here"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="test_code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Test Code</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      className="max-h-60"
+                      disabled={form.formState.isSubmitting}
+                      placeholder="Enter test code here"
                       {...field}
                     />
                   </FormControl>
