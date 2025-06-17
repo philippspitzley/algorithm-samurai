@@ -626,11 +626,6 @@ export interface components {
       exercise?: string | null
       /** Test Code */
       test_code?: string | null
-      /**
-       * Completed
-       * @default false
-       */
-      completed: boolean
     }
     /** ChapterPointCreate */
     ChapterPointCreate: {
@@ -701,11 +696,6 @@ export interface components {
       /** Test Code */
       test_code?: string | null
       /**
-       * Completed
-       * @default false
-       */
-      completed: boolean
-      /**
        * Id
        * Format: uuid
        */
@@ -717,16 +707,6 @@ export interface components {
       course_id: string
       /** Points */
       points?: components["schemas"]["ChapterPointPublic"][] | null
-      /**
-       * Created At
-       * Format: date-time
-       */
-      created_at: string
-      /**
-       * Updated At
-       * Format: date-time
-       */
-      updated_at: string
     }
     /** ChapterUpdate */
     ChapterUpdate: {
@@ -740,8 +720,6 @@ export interface components {
       exercise?: string | null
       /** Test Code */
       test_code?: string | null
-      /** Completed */
-      completed?: boolean | null
     }
     /** ChaptersPublic */
     ChaptersPublic: {
