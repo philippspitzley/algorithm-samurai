@@ -25,6 +25,7 @@ interface Props {
   isSubmitting: boolean
   setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>
   editorRef: React.RefObject<MonacoEditorInstance | null>
+  testCode?: string
 }
 
 function useJudge0CodeExecution({
@@ -33,6 +34,7 @@ function useJudge0CodeExecution({
   isSubmitting,
   setIsSubmitting,
   editorRef,
+  testCode,
 }: Props) {
   // Clear any ongoing polling when the component unmounts
   useEffect(() => {
@@ -41,7 +43,7 @@ function useJudge0CodeExecution({
         clearInterval(pollingIntervalRef.current)
       }
     }
-  }, [])
+  }, [pollingIntervalRef])
 
   async function requestCodeExecution() {
     if (!editorRef.current) {
@@ -53,8 +55,10 @@ function useJudge0CodeExecution({
       return
     }
 
-    const sourceCode = editorRef.current.getValue()
-    if (!sourceCode.trim()) {
+    const userCode = editorRef.current.getValue()
+    const fullCode = testCode ? `${userCode}\n\n${testCode}` : userCode
+
+    if (!fullCode.trim()) {
       setEditorOutput((prev) => [...prev, "Warning: Editor is empty. Nothing to submit."])
       return
     }
@@ -67,9 +71,8 @@ function useJudge0CodeExecution({
       clearInterval(pollingIntervalRef.current)
     }
 
-    const encodedSourceCode = btoa(unescape(encodeURIComponent(sourceCode)))
     const url =
-      "https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&wait=false&fields=token"
+      "https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=false&fields=token"
     const options: RequestInit = {
       method: "POST",
       headers: {
@@ -79,7 +82,7 @@ function useJudge0CodeExecution({
       },
       body: JSON.stringify({
         language_id: 102, // JavaScript (Node.js 22.08.0)
-        source_code: encodedSourceCode,
+        source_code: fullCode,
       }),
     }
 
