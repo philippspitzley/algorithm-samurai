@@ -12,6 +12,7 @@ function usePistonApi() {
   const [runtimeError, setRuntimeError] = useState<CodeError | null>(null)
   const [hasRuntimeError, setHasRuntimeError] = useState(false)
   const [output, setOutput] = useState<string[] | null>(null)
+  const [testPassed, setTestPassed] = useState(false)
 
   const executionMutation = $api.useMutation("post", "/api/v1/piston/execute", {
     onSuccess: () => {
@@ -67,6 +68,20 @@ function usePistonApi() {
     }
   }, [executionMutation.data])
 
+  // Check if tests passed
+  useEffect(() => {
+    setTestPassed(false)
+    if (output && output.length > 0) {
+      const lastLine = output[output.length - 1]
+
+      if (lastLine.includes("🎉")) {
+        setTestPassed(true)
+      } else {
+        setTestPassed(false)
+      }
+    }
+  }, [output])
+
   const onClearOutput = useCallback(() => {
     setOutput([])
     setRuntimeError(null)
@@ -83,6 +98,7 @@ function usePistonApi() {
     isLoading: executionMutation.isPending,
     isError: executionMutation.isError,
     hasRuntimeError,
+    testPassed,
 
     // Actions
     executeCode,
