@@ -192,7 +192,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/v1/users/me/courses/{course_id}": {
+  "/api/v1/users/me/courses/{course_id}/enroll": {
     parameters: {
       query?: never
       header?: never
@@ -206,6 +206,62 @@ export interface paths {
      * @description Enroll new course.
      */
     post: operations["users-enroll_course"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/users/me/chapters/{chapter_id}/complete": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Complete Chapter
+     * @description Complete chapter.
+     */
+    post: operations["users-complete_chapter"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/users/me/chapters/{chapter_id}/isCompleted": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Is Chapter Completed
+     * @description Check if chapter is completed by the current user.
+     */
+    get: operations["users-is_chapter_completed"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/users/me/courses/{course_id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
     delete?: never
     options?: never
     head?: never
@@ -396,30 +452,6 @@ export interface paths {
     get: operations["chapters-get_chapter_points_from_chapter"]
     put?: never
     post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/chapters/{chapter_id}/completed": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Is Chapter Completed
-     * @description Check if chapter is completed by the current user.
-     */
-    get: operations["chapters-is_chapter_completed"]
-    put?: never
-    /**
-     * Complete Chapter
-     * @description Set chapter to completed.
-     */
-    post: operations["chapters-complete_chapter"]
     delete?: never
     options?: never
     head?: never
@@ -1506,7 +1538,79 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["UserCourse"]
+          "application/json": components["schemas"]["UserCoursePublic"]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  "users-complete_chapter": {
+    parameters: {
+      query?: never
+      header?: {
+        authorization?: string | null
+      }
+      path: {
+        chapter_id: string
+      }
+      cookie?: {
+        access_token?: string | null
+      }
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["UserCoursePublic"]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  "users-is_chapter_completed": {
+    parameters: {
+      query?: never
+      header?: {
+        authorization?: string | null
+      }
+      path: {
+        chapter_id: string
+      }
+      cookie?: {
+        access_token?: string | null
+      }
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": {
+            [key: string]: boolean
+          }
         }
       }
       /** @description Validation Error */
@@ -2118,80 +2222,6 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["ChapterPointPublic"][]
-        }
-      }
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"]
-        }
-      }
-    }
-  }
-  "chapters-is_chapter_completed": {
-    parameters: {
-      query?: never
-      header?: {
-        authorization?: string | null
-      }
-      path: {
-        chapter_id: string
-      }
-      cookie?: {
-        access_token?: string | null
-      }
-    }
-    requestBody?: never
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": {
-            [key: string]: boolean
-          }
-        }
-      }
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"]
-        }
-      }
-    }
-  }
-  "chapters-complete_chapter": {
-    parameters: {
-      query: {
-        course_id: string
-      }
-      header?: {
-        authorization?: string | null
-      }
-      path: {
-        chapter_id: string
-      }
-      cookie?: {
-        access_token?: string | null
-      }
-    }
-    requestBody?: never
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Message"]
         }
       }
       /** @description Validation Error */
