@@ -1,6 +1,5 @@
 import { SquarePen, X } from "lucide-react"
 
-import { useAuth } from "@/context/auth/useAuth"
 import { cn } from "@/lib/utils"
 
 import { Button } from "../ui/button"
@@ -13,10 +12,7 @@ interface Props {
 }
 
 function AdminEditButtons({ className, onEdit, onDelete, isEditing }: Props) {
-  const { user } = useAuth()
   const styles = cn("flex gap-2", className)
-
-  if (!user || !user.is_superuser) return null
 
   return (
     <div className={styles}>
