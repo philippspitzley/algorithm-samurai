@@ -3,8 +3,9 @@ import { Outlet, useParams } from "react-router-dom"
 import { $api } from "@/api/api"
 import ChapterSidebar from "@/components/Chapter/ChapterSidebar"
 import LoadingSpinner from "@/components/LoadingSpinner"
+import { Card } from "@/components/ui/card"
 
-import NotFound from "./NotFound"
+import NotFound from "../../pages/NotFound"
 
 function CourseLayout() {
   const { courseId } = useParams()
@@ -25,12 +26,10 @@ function CourseLayout() {
   const course = data
 
   return (
-    <>
-      <div className="bg-background/90 flex gap-6 rounded-xl border-1 p-8 backdrop-blur-lg">
-        <ChapterSidebar courseId={course?.id} title={course?.title} />
-        <Outlet />
-      </div>
-    </>
+    <Card className="bg-background/90 flex flex-row gap-6 rounded-xl border-1 p-8 backdrop-blur-lg">
+      <ChapterSidebar courseId={course?.id} title={course?.title} />
+      <Outlet />
+    </Card>
   )
 }
 

@@ -21,8 +21,8 @@ interface Props {
 function Course({ data: course }: Props) {
   const { isAuthenticated } = useAuth()
   const { updateCourse, deleteCourse } = useCourses({ courseId: course.id })
-  const { isEnrolled, enrollCourse, getCourse } = useUserCoursesContext()
-  const userCourse = getCourse(course.id)
+  const { isEnrolled, enrollCourse, getMyCourse } = useUserCoursesContext()
+  const userCourse = getMyCourse(course.id)
 
   const courseEnrolled = isAuthenticated ? isEnrolled(course.id) : false
   const canAccessCourse = isAuthenticated && courseEnrolled
