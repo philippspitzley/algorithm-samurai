@@ -9,12 +9,17 @@ interface Props {
   isLoading: boolean
   hasRuntimeError: boolean
   isError: boolean
+  testPassed: boolean
 
   onClearOutput: () => void
 }
 
 function Terminal(props: Props) {
-  const { output, isLoading, isError, hasRuntimeError, onClearOutput } = props
+  const { output, isLoading, isError, hasRuntimeError, onClearOutput, testPassed } = props
+
+  const testPassedStyles = testPassed
+    ? "border-8 border-terminal animate-[border-pulse_2s_ease-in-out_infinite]"
+    : ""
 
   return (
     <Card className="bg-primary/5 ml-6 rounded-lg px-4 py-4 text-left shadow-none">
@@ -27,14 +32,15 @@ function Terminal(props: Props) {
         </Button>
       </div>
       <div>
-        <div className="bg-card max-h-64 min-h-16 overflow-y-auto rounded border p-3 font-mono text-sm">
+        <div
+          className={`bg-card min-h-16 overflow-y-auto rounded border p-3 font-mono text-sm ${testPassedStyles}`}
+        >
           {isLoading && (
             <div className="text-muted-foreground flex items-center gap-2">
               <LoadingSpinner />
               <span>Executing code...</span>
             </div>
           )}
-
           {output && output.length > 0 && (
             <pre
               className={`whitespace-pre-wrap ${hasRuntimeError ? "text-[#F38BA8]" : "text-foreground"}`}
@@ -42,7 +48,6 @@ function Terminal(props: Props) {
               {output.join("\n")}
             </pre>
           )}
-
           {!isLoading && !isError && (!output || output.length === 0) && (
             <div className="text-muted-foreground italic">
               No output yet. Run your code to see results here.

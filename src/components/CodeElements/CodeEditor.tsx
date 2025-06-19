@@ -18,17 +18,26 @@ export type MonacoEditorInstance = MonacoEditorTypes.IStandaloneCodeEditor
 interface CodeEditorProps {
   defaultValue?: string
   testCode?: string | null
+  onTestPassedChange?: (testPassed: boolean) => void
 }
 
-function CodeEditor({ defaultValue, testCode }: CodeEditorProps) {
+function CodeEditor(props: CodeEditorProps) {
+  const { defaultValue, testCode, onTestPassedChange } = props
   const editorRef = useRef<MonacoEditorInstance | null>(null)
   const decorationsRef = useRef<MonacoEditorTypes.IEditorDecorationsCollection | null>(null)
   const { theme: appEffectiveTheme } = useTheme()
   const monacoInstance = useMonaco()
   const { currentEditorMonacoTheme } = useShikiMonacoTheme(appEffectiveTheme, monacoInstance)
-
-  const { executeCode, onClearOutput, isLoading, isError, hasRuntimeError, output, runtimeError } =
-    usePistonApi()
+  const {
+    executeCode,
+    onClearOutput,
+    isLoading,
+    isError,
+    hasRuntimeError,
+    output,
+    runtimeError,
+    testPassed,
+  } = usePistonApi()
 
   const highlightErrors = useCallback(
     (lineNumber: number) => {
@@ -64,7 +73,6 @@ function CodeEditor({ defaultValue, testCode }: CodeEditorProps) {
 
   // Highlight errors when errorLineNumber changes
   useEffect(() => {
-    console.info("Code Error:", runtimeError)
     if (runtimeError?.line && hasRuntimeError) {
       highlightErrors(Number(runtimeError.line))
     } else {
@@ -78,7 +86,6 @@ function CodeEditor({ defaultValue, testCode }: CodeEditorProps) {
 
   function handleCodeExecution() {
     if (decorationsRef.current) {
-      console.info("Clearing previous decorations")
       decorationsRef.current.clear()
     }
     const userCode = editorRef.current?.getValue() || ""
@@ -103,6 +110,13 @@ function CodeEditor({ defaultValue, testCode }: CodeEditorProps) {
       editorRef.current.trigger("anyString", "editor.action.formatDocument", null)
     }
   }
+
+  // Notify parent when testPassed changes
+  useEffect(() => {
+    if (onTestPassedChange && typeof onTestPassedChange === "function") {
+      onTestPassedChange(testPassed)
+    }
+  }, [testPassed, onTestPassedChange])
 
   return (
     <Card className="bg-card gap-14 rounded-xl p-6 pr-10 pl-4 shadow-lg">
@@ -151,6 +165,7 @@ function CodeEditor({ defaultValue, testCode }: CodeEditorProps) {
         isError={isError}
         hasRuntimeError={hasRuntimeError}
         onClearOutput={onClearOutput}
+        testPassed={testPassed}
       />
     </Card>
   )
