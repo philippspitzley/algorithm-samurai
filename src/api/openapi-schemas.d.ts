@@ -232,6 +232,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/users/me/course/{course_id}/updateProgress": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /**
+     * Update My Chapter Progress
+     * @description Calculate user progress depending on current chapter quantity.
+     */
+    patch: operations["users-update_my_chapter_progress"]
+    trace?: never
+  }
   "/api/v1/users/me/chapters/{chapter_id}/isCompleted": {
     parameters: {
       query?: never
@@ -648,8 +668,6 @@ export interface components {
     }
     /** ChapterCreate */
     ChapterCreate: {
-      /** Chapter Num */
-      chapter_num: number
       /** Title */
       title: string
       /** Description */
@@ -717,8 +735,6 @@ export interface components {
     }
     /** ChapterPublic */
     ChapterPublic: {
-      /** Chapter Num */
-      chapter_num: number
       /** Title */
       title: string
       /** Description */
@@ -737,13 +753,13 @@ export interface components {
        * Format: uuid
        */
       course_id: string
+      /** Chapter Num */
+      chapter_num: number
       /** Points */
       points?: components["schemas"]["ChapterPointPublic"][] | null
     }
     /** ChapterUpdate */
     ChapterUpdate: {
-      /** Chapter Num */
-      chapter_num?: number | null
       /** Title */
       title?: string | null
       /** Description */
@@ -979,38 +995,6 @@ export interface components {
       current_password: string
       /** New Password */
       new_password: string
-    }
-    /** UserCourse */
-    UserCourse: {
-      /** @default enrolled */
-      status: components["schemas"]["CourseStatus"]
-      /**
-       * Current Chapter
-       * @default 1
-       */
-      current_chapter: number
-      /**
-       * Progress
-       * @default 0
-       */
-      progress: number
-      /**
-       * Created At
-       * @description Database timestamp when the record was created.
-       */
-      created_at?: string | null
-      /** Updated At */
-      updated_at?: string | null
-      /**
-       * User Id
-       * Format: uuid
-       */
-      user_id: string
-      /**
-       * Course Id
-       * Format: uuid
-       */
-      course_id: string
     }
     /** UserCoursePublic */
     UserCoursePublic: {
@@ -1587,6 +1571,41 @@ export interface operations {
       }
     }
   }
+  "users-update_my_chapter_progress": {
+    parameters: {
+      query?: never
+      header?: {
+        authorization?: string | null
+      }
+      path: {
+        course_id: string
+      }
+      cookie?: {
+        access_token?: string | null
+      }
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["UserCoursePublic"]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   "users-is_chapter_completed": {
     parameters: {
       query?: never
@@ -1649,7 +1668,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["UserCourse"]
+          "application/json": components["schemas"]["UserCoursePublic"]
         }
       }
       /** @description Validation Error */
