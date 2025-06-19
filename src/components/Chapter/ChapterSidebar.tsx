@@ -1,15 +1,13 @@
-import { Circle, CircleCheck, Plus } from "lucide-react"
+import { Circle, CircleCheck } from "lucide-react"
 import { NavLink } from "react-router-dom"
-import { toast } from "sonner"
 
-import { APISchemas } from "@/api/types"
 import useUserCourses from "@/context/userCourses/useUserCourses"
 import { cn } from "@/lib/utils"
 import NotFound from "@/pages/NotFound"
 
 import AdminContext from "../Admin/AdminContext"
 import LoadingSpinner from "../LoadingSpinner"
-import { Button } from "../ui/button"
+import AddChapterButton from "./AddChapterButton"
 import useChapters from "./useChapters"
 
 interface Props {
@@ -22,7 +20,7 @@ function ChapterSidebar(props: Props) {
   const { courseId, title, className } = props
 
   const { data: chapters, isLoading, isError, createChapter } = useChapters({ courseId: courseId! })
-  const { userCourses } = useUserCourses()
+  const { userCourses, updateMyCourseProgress } = useUserCourses()
 
   if (isLoading) return <LoadingSpinner />
 
@@ -31,22 +29,8 @@ function ChapterSidebar(props: Props) {
   const finishedChapters =
     userCourses?.find((course) => course.course_id === courseId)?.finished_chapters || []
 
-  const createNewChapter = () => {
-    const newChapterTitle = "New Chapter"
-    const newChapterDescription = "Description of the new chapter"
-    if (!chapters) {
-      toast.error("Chapters data is not available.")
-      return
-    }
-    const newChapter: APISchemas["ChapterCreate"] = {
-      title: newChapterTitle,
-      description: newChapterDescription,
-      chapter_num: chapters?.count ? chapters.count + 1 : 1,
-    }
-    createChapter(newChapter)
-  }
   return (
-    <div className={cn("flex flex-col items-center gap-2", className)}>
+    <div className={cn("flex flex-col items-center gap-2 max-lg:w-10", className)}>
       <NavLink
         to={`courses/${courseId}`}
         end
@@ -72,7 +56,7 @@ function ChapterSidebar(props: Props) {
           >
             {chapter.title}
             {finishedChapters?.includes(chapter.id) ? (
-              <CircleCheck size={18} className="text-green-400" />
+              <CircleCheck size={18} className="text-terminal" />
             ) : (
               <Circle size={18} />
             )}
@@ -80,9 +64,11 @@ function ChapterSidebar(props: Props) {
         )
       })}
       <AdminContext className="w-full">
-        <Button variant="outline" onClick={createNewChapter} className="w-full">
-          <Plus /> Add Chapter
-        </Button>
+        <AddChapterButton
+          courseId={courseId!}
+          onCreateChapter={createChapter}
+          onProgressUpdate={updateMyCourseProgress}
+        />
       </AdminContext>
     </div>
   )
