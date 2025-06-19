@@ -1,17 +1,18 @@
 import { useCallback, useEffect, useRef } from "react"
 
 import Editor, { useMonaco } from "@monaco-editor/react"
-import { LoaderCircle, Play, SendHorizontal, Sparkles } from "lucide-react"
+import { Bot, LoaderCircle, Play, SendHorizontal, Sparkles } from "lucide-react"
 import type { editor as MonacoEditorTypes } from "monaco-editor"
 import { toast } from "sonner"
 
 import { useTheme } from "@/context/theme/useTheme"
-// import useJudge0CodeExecution from "@/hooks/useJudge0CodeExecution"
 import useShikiMonacoTheme from "@/hooks/useShikiMonacoTheme"
 
 import { Button } from "../ui/button"
 import { Card } from "../ui/card"
+import AiTutor from "./AiTutor"
 import Terminal from "./Terminal"
+import useAiTutor from "./useAiTutor"
 import usePistonApi, { CodeRequest } from "./usePistonApi"
 
 export type MonacoEditorInstance = MonacoEditorTypes.IStandaloneCodeEditor
@@ -39,6 +40,19 @@ function CodeEditor(props: CodeEditorProps) {
     runtimeError,
     testPassed,
   } = usePistonApi()
+
+  const {
+    generateAiHints,
+    aiHints,
+    error: aiError,
+    isError: aiIsError,
+    isLoading: aiIsLoading,
+  } = useAiTutor({
+    userCode: editorRef.current?.getValue() || "",
+    testCode: testCode || "",
+    error: runtimeError?.message || null,
+    exercise_description: "",
+  })
 
   const highlightErrors = useCallback(
     (lineNumber: number) => {
@@ -122,6 +136,10 @@ function CodeEditor(props: CodeEditorProps) {
     }
   }
 
+  function handleAiHints() {
+    generateAiHints()
+  }
+
   // Notify parent when testPassed changes
   useEffect(() => {
     if (onTestPassedChange && typeof onTestPassedChange === "function") {
@@ -144,7 +162,6 @@ function CodeEditor(props: CodeEditorProps) {
             fontSize: 16,
             overviewRulerLanes: 0,
             wordWrap: "on",
-
             lineNumbers: "on",
           }}
         />
@@ -152,6 +169,10 @@ function CodeEditor(props: CodeEditorProps) {
         <div className="absolute right-0 -bottom-11 flex gap-2">
           <Button size="icon" variant={"outline"} onClick={formatCode} title="Format Code">
             <Sparkles />
+          </Button>
+
+          <Button size="icon" variant={"outline"} onClick={handleAiHints} title="Generate AI Hints">
+            <Bot />
           </Button>
 
           <Button
@@ -169,6 +190,8 @@ function CodeEditor(props: CodeEditorProps) {
           </Button>
         </div>
       </div>
+
+      <AiTutor aiHints={aiHints} isLoading={aiIsLoading} isError={aiIsError} error={aiError} />
 
       <Terminal
         output={output}
