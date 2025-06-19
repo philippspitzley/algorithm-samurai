@@ -40,7 +40,6 @@ const FormSchema = z.object({
   description: z.string().min(1, {
     message: "Help learners understand what they'll discover - add a brief description!",
   }),
-  chapter_num: z.coerce.number().min(1, { message: "Chapter number must be at least 1." }),
   exercise: z.string().optional(),
   test_code: z.string().optional(),
 })
@@ -57,7 +56,6 @@ function UpdateChapterForm({ onSubmit: updateChapter, defaultValues: chapter }: 
     return {
       title: chapter.title ?? "",
       description: chapter.description ?? "",
-      chapter_num: chapter.chapter_num ?? 1,
       exercise: chapter.exercise ?? "",
       test_code: chapter.test_code ?? "",
     }
@@ -125,26 +123,6 @@ function UpdateChapterForm({ onSubmit: updateChapter, defaultValues: chapter }: 
                       className="max-h-60"
                       disabled={form.formState.isSubmitting}
                       placeholder="This new course teaches about ..."
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="chapter_num"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Chapter Number</FormLabel>
-                  <FormDescription>The chapter number must be at least 1.</FormDescription>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      disabled={form.formState.isSubmitting}
-                      placeholder="1"
                       {...field}
                     />
                   </FormControl>
