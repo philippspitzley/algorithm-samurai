@@ -3,11 +3,10 @@ import { useEffect, useState } from "react"
 import { CheckCheck, Copy } from "lucide-react"
 import { codeToHtml } from "shiki"
 
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
 import { useTheme } from "@/context/theme/useTheme"
-
-import { Button } from "../ui/button"
-import { Card, CardContent, CardHeader } from "../ui/card"
-import { Separator } from "../ui/separator"
 
 interface CodeBlockProps {
   code: string
@@ -59,9 +58,7 @@ function CodeBlock(props: CodeBlockProps) {
     <div className="container rounded-xl">
       <Card className="relative w-full">
         <CardHeader className="-mt-5 flex items-baseline gap-6">
-          {fileName && (
-            <span className="text-primary/90 text-sm">{fileName}</span>
-          )}
+          {fileName && <span className="text-primary/90 text-sm">{fileName}</span>}
           <span className="text-primary/50 text-xs">{language}</span>
 
           <Button
@@ -83,10 +80,7 @@ function CodeBlock(props: CodeBlockProps) {
 
         <CardContent className="flex items-center justify-between">
           {}
-          <div
-            className="shiki-container"
-            dangerouslySetInnerHTML={{ __html: highlightedCode }}
-          />
+          <div className="shiki-container" dangerouslySetInnerHTML={{ __html: highlightedCode }} />
         </CardContent>
       </Card>
     </div>
