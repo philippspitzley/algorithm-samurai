@@ -31,10 +31,6 @@ function NextChapterButton(props: Props) {
 
     const currentExerciseCompleted = chapter.exercise ? testPassed : true
 
-    console.log("Fresh testPassed:", testPassed)
-    console.log("Fresh Exercise Completed:", currentExerciseCompleted)
-    console.log("Fresh Chapter Completed:", currentChapterCompleted)
-
     // Case 1: Chapter not completed yet, but exercise is done - complete it and show success
     if (!currentChapterCompleted && currentExerciseCompleted) {
       completeMyChapter(chapter.id)
