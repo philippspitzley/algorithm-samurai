@@ -12,7 +12,11 @@ interface UserCoursesContextType {
   isError: boolean
   isEnrolled: (courseId: string) => boolean
   enrollCourse: (courseId: string) => void
-  getCourse: (courseId: string) => APISchemas["UserCoursePublic"] | undefined
+  getMyCourse: (courseId: string) => APISchemas["UserCoursePublic"] | undefined
+  updateMyCourse: (courseId: string, body: APISchemas["UserCourseUpdate"]) => void
+  completeMyChapter: (chapterId: string) => void
+  isMyChapterCompleted: (chapterId: string, courseId: string) => boolean
+  updateMyCourseProgress: (courseId: string) => void
 }
 
 // Context Provider
