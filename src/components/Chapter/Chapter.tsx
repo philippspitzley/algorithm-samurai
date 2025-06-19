@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react"
 
-import { SquareArrowRight } from "lucide-react"
-import { Link, useParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
 
 import AdminEditButtons from "@/components/Admin/AdminEditButtons"
 import CodeEditor from "@/components/CodeElements/CodeEditor"
 import NotFound from "@/pages/NotFound"
 
+import AdminContext from "../Admin/AdminContext"
 import LoadingSpinner from "../LoadingSpinner"
 import Markdown from "../Markdown/Markdown"
 import { Button } from "../ui/button"
@@ -50,19 +50,20 @@ function Chapter() {
   return (
     <div className="relative flex flex-6 flex-col gap-4">
       <h1 className="text-3xl">{chapter.title}</h1>
+      <AdminContext>
+        <UpdateChapterForm
+          key={`chapter-form-${chapter.id}`}
+          onSubmit={updateChapter}
+          defaultValues={chapter}
+        />
 
-      <UpdateChapterForm
-        key={`chapter-form-${chapter.id}`}
-        onSubmit={updateChapter}
-        defaultValues={chapter}
-      />
-
-      <AdminEditButtons
-        isEditing={adminIsEditing}
-        onEdit={toggleEdit}
-        onDelete={deleteChapter}
-        className="absolute right-0"
-      />
+        <AdminEditButtons
+          isEditing={adminIsEditing}
+          onEdit={toggleEdit}
+          onDelete={deleteChapter}
+          className="absolute right-0"
+        />
+      </AdminContext>
 
       <Markdown
         markdown={chapter.description}
