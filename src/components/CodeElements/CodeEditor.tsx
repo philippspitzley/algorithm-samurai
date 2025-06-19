@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef } from "react"
 import Editor, { useMonaco } from "@monaco-editor/react"
 import { LoaderCircle, Play, SendHorizontal, Sparkles } from "lucide-react"
 import type { editor as MonacoEditorTypes } from "monaco-editor"
+import { toast } from "sonner"
 
 import { useTheme } from "@/context/theme/useTheme"
 // import useJudge0CodeExecution from "@/hooks/useJudge0CodeExecution"
@@ -105,6 +106,16 @@ function CodeEditor(props: CodeEditorProps) {
     executeCode(body)
   }
 
+  function handleSubmit() {
+    const userCode = editorRef.current?.getValue() || ""
+
+    if (!userCode.trim()) {
+      return
+    }
+    toast.info("Placeholder for Submitting your code. Not implemented yet.")
+    //TODO: Write submitted code to a backend UserCourse and handle submission logic
+  }
+
   function formatCode() {
     if (editorRef.current) {
       editorRef.current.trigger("anyString", "editor.action.formatDocument", null)
@@ -152,7 +163,7 @@ function CodeEditor(props: CodeEditorProps) {
           >
             <Play />
           </Button>
-          <Button disabled={isLoading} title="Submit Code">
+          <Button disabled={isLoading} onClick={handleSubmit} title="Submit Code">
             <SendHorizontal />
             {isLoading ? <LoaderCircle className="animate-spin" /> : "Submit"}
           </Button>
