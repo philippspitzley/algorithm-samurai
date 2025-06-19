@@ -9,13 +9,14 @@ import NotFound from "@/pages/NotFound"
 import AdminContext from "../Admin/AdminContext"
 import LoadingSpinner from "../LoadingSpinner"
 import Markdown from "../Markdown/Markdown"
-import { Button } from "../ui/button"
+import NextChapterButton from "./NextChapterButton"
 import UpdateChapterForm from "./UpdateChapterForm"
 import useChapters from "./useChapters"
 
 function Chapter() {
   const { chapterId, courseId } = useParams()
   const [adminIsEditing, setAdminIsEditing] = useState(false)
+  const [testPassed, setTestPassed] = useState(false)
   const { data, isLoading, isError, updateChapter, deleteChapter } = useChapters({
     chapterId: chapterId!,
     courseId: courseId!,
@@ -73,15 +74,18 @@ function Chapter() {
       />
 
       {chapter.exercise && (
-        <CodeEditor defaultValue={chapter.exercise} testCode={chapter.test_code} />
+        <CodeEditor
+          defaultValue={chapter.exercise}
+          testCode={chapter.test_code}
+          onTestPassedChange={setTestPassed}
+        />
       )}
-      {nextChapter && (
-        <Button asChild>
-          <Link to={`/courses/${courseId}/${nextChapter.id}`}>
-            Next Chapter <SquareArrowRight />
-          </Link>
-        </Button>
-      )}
+
+      <NextChapterButton
+        currentChapter={chapter}
+        nextChapter={nextChapter}
+        testPassed={testPassed}
+      />
     </div>
   )
 }
