@@ -794,7 +794,7 @@ export interface components {
        * Code
        * @default 0
        */
-      code: number
+      code: number | null
       /**
        * Output
        * @default
@@ -927,7 +927,7 @@ export interface components {
        * Previous Hints
        * @default []
        */
-      previous_hints: string[]
+      previous_hints: components["schemas"]["HintResponse"][]
     }
     /** HintResponse */
     HintResponse: {
