@@ -75,6 +75,7 @@ function Chapter() {
 
       {chapter.exercise && (
         <CodeEditor
+          key={`code-editor-${chapter.id}`}
           defaultValue={chapter.exercise}
           testCode={chapter.test_code}
           onTestPassedChange={setTestPassed}
