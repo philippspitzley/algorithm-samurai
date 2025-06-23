@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react"
+
 import { toast } from "sonner"
 
 import { APISchemas } from "@/api/types"
@@ -15,6 +17,14 @@ interface Props {
 
 function AiTutor(props: Props) {
   const { aiHints, error: aiError, isError: aiIsError, isLoading: aiIsLoading } = props
+  const [openAiHint, setOpenAiHint] = useState<string>("")
+
+  // Update open item when hints change
+  useEffect(() => {
+    if (aiHints.length > 0) {
+      setOpenAiHint(`item-${aiHints.length}`)
+    }
+  }, [aiHints.length])
 
   if (aiIsError) {
     if (aiError?.detail) {
@@ -35,7 +45,13 @@ function AiTutor(props: Props) {
       <CardHeader>AI Tutor</CardHeader>
       <CardContent>
         {aiIsLoading && <LoadingSpinner />}
-        <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
+        <Accordion
+          type="single"
+          collapsible
+          className="w-full"
+          value={openAiHint}
+          onValueChange={setOpenAiHint}
+        >
           {aiHints.map((hint, index) => (
             <AccordionItem value={`item-${index + 1}`} key={`item-${index + 1}`}>
               <AccordionTrigger>Hint {index + 1}</AccordionTrigger>
