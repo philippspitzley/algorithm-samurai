@@ -36,7 +36,7 @@ function usePistonApi() {
     if (data.run) {
       const { stdout, stderr, code: exitCode } = data.run
 
-      if (exitCode === 0) {
+      if (exitCode === 0 || exitCode === null) {
         // Successful execution
         setHasRuntimeError(false)
         setOutput([stdout || "Code executed successfully (no output)"])
