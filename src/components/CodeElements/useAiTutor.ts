@@ -15,7 +15,6 @@ function useAiTutor(props: Props) {
   const [aiHints, setAiHints] = useState<APISchemas["HintResponse"][]>([])
   const generateMutation = $api.useMutation("post", "/api/v1/ai/generate", {
     onSuccess: (data) => {
-      console.log("AI Tutor response:", data)
       setAiHints((prev) => [...prev, data])
     },
     onError: (error) => {
