@@ -1,34 +1,53 @@
 import { SquarePen, X } from "lucide-react"
 
+import { APISchemas } from "@/api/types"
 import { cn } from "@/lib/utils"
 
-import { Button } from "../ui/button"
+import ButtonWithTooltip from "../ButtonWithTooltip"
+import UpdateChapterForm from "../Chapter/UpdateChapterForm"
+import DeleteButton from "./DeleteButton"
 
 interface Props {
   className?: string
+  chapter: APISchemas["ChapterPublic"]
   onEdit?: () => void
+  onUpdate: (body: APISchemas["ChapterUpdate"]) => void
   onDelete?: () => void
   isEditing?: boolean
 }
 
-function AdminEditButtons({ className, onEdit, onDelete, isEditing }: Props) {
+function AdminEditButtons({ className, chapter, onEdit, onUpdate, onDelete, isEditing }: Props) {
   const styles = cn("flex gap-2", className)
 
   return (
     <div className={styles}>
-      <Button
+      <ButtonWithTooltip
         onClick={onEdit}
-        variant="secondary"
+        variant="outline"
         size="icon"
+        tooltip="Edit Markdown"
         className={isEditing ? "animate-pulse" : ""}
       >
-        <span className="sr-only">Edit</span>
         <SquarePen />
-      </Button>
-      <Button onClick={onDelete} variant="destructive" size="icon">
-        <span className="sr-only">Delete</span>
-        <X />
-      </Button>
+      </ButtonWithTooltip>
+
+      <UpdateChapterForm
+        key={`chapter-form-${chapter.id}`}
+        defaultValues={chapter}
+        onSubmit={onUpdate}
+      />
+
+      <DeleteButton
+        onClick={onDelete}
+        className="bg-ctp-red/80 hover:bg-ctp-red"
+        size="icon"
+        tooltip="Delete Chapter"
+        item="chapter"
+      >
+        <>
+          <X />
+        </>
+      </DeleteButton>
     </div>
   )
 }
