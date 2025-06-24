@@ -2,15 +2,14 @@ import { useEffect, useState } from "react"
 
 import { useParams } from "react-router-dom"
 
+import AdminContext from "@/components/Admin/AdminContext"
 import AdminEditButtons from "@/components/Admin/AdminEditButtons"
 import CodeEditor from "@/components/CodeElements/CodeEditor"
+import LoadingSpinner from "@/components/LoadingSpinner"
+import Markdown from "@/components/Markdown/Markdown"
 import NotFound from "@/pages/NotFound"
 
-import AdminContext from "../Admin/AdminContext"
-import LoadingSpinner from "../LoadingSpinner"
-import Markdown from "../Markdown/Markdown"
 import NextChapterButton from "./NextChapterButton"
-import UpdateChapterForm from "./UpdateChapterForm"
 import useChapters from "./useChapters"
 
 function Chapter() {
@@ -50,19 +49,15 @@ function Chapter() {
 
   return (
     <div className="relative flex flex-6 flex-col gap-4">
-      <h1 className="text-3xl">{chapter.title}</h1>
+      <h1 className="text-3xl">{`Chapter ${chapter.chapter_num}`}</h1>
       <AdminContext>
-        <UpdateChapterForm
-          key={`chapter-form-${chapter.id}`}
-          onSubmit={updateChapter}
-          defaultValues={chapter}
-        />
-
         <AdminEditButtons
           isEditing={adminIsEditing}
           onEdit={toggleEdit}
           onDelete={deleteChapter}
-          className="absolute right-0"
+          className="absolute top-0 right-0"
+          chapter={chapter}
+          onUpdate={updateChapter}
         />
       </AdminContext>
 
