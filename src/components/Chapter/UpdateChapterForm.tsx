@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { LoaderCircle, SquarePen } from "lucide-react"
+import { FileText, LoaderCircle } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -18,6 +18,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 
+import ButtonWithTooltip from "../ButtonWithTooltip"
 import {
   Form,
   FormControl,
@@ -76,10 +77,9 @@ function UpdateChapterForm({ onSubmit: updateChapter, defaultValues: chapter }: 
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="secondary" size="icon">
-          <span className="sr-only">Edit</span>
-          <SquarePen />
-        </Button>
+        <ButtonWithTooltip variant="outline" size="icon" tooltip="Edit Chapter">
+          <FileText />
+        </ButtonWithTooltip>
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
