@@ -1,7 +1,7 @@
 import { Ban, SquareTerminal } from "lucide-react"
 
+import ButtonWithTooltip from "../ButtonWithTooltip"
 import LoadingSpinner from "../LoadingSpinner"
-import { Button } from "../ui/button"
 import { Card } from "../ui/card"
 
 interface Props {
@@ -22,18 +22,23 @@ function Terminal(props: Props) {
     : ""
 
   return (
-    <Card className="bg-primary/5 ml-6 rounded-lg px-4 py-4 text-left shadow-none">
+    <Card className="ml-6 rounded-lg px-4 py-4 text-left shadow-none">
       <div className="flex justify-between">
         <h3 className="text-md mb-4 flex gap-2 opacity-70">
           <SquareTerminal size={24} /> Console Output:
         </h3>
-        <Button size="icon" variant="outline" onClick={onClearOutput} title="Clear Console">
+        <ButtonWithTooltip
+          size="icon"
+          variant="ghost"
+          onClick={onClearOutput}
+          tooltip="Clear Console"
+        >
           <Ban size={16} />
-        </Button>
+        </ButtonWithTooltip>
       </div>
       <div>
         <div
-          className={`bg-card min-h-16 overflow-y-auto rounded border p-3 font-mono text-sm ${testPassedStyles}`}
+          className={`bg-background min-h-16 rounded border p-3 font-mono text-sm ${testPassedStyles}`}
         >
           {isLoading && (
             <div className="text-muted-foreground flex items-center gap-2">
