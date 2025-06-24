@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef } from "react"
 
 import Editor, { useMonaco } from "@monaco-editor/react"
-import { Bot, LoaderCircle, Play, SendHorizontal, Sparkles } from "lucide-react"
+import { Bot, Play, Sparkles } from "lucide-react"
 import type { editor as MonacoEditorTypes } from "monaco-editor"
-import { toast } from "sonner"
 
 import { useTheme } from "@/context/theme/useTheme"
 import useShikiMonacoTheme from "@/hooks/useShikiMonacoTheme"
 
+import ButtonWithTooltip from "../ButtonWithTooltip"
 import { Button } from "../ui/button"
 import { Card } from "../ui/card"
 import AiTutor from "./AiTutor"
@@ -120,15 +120,15 @@ function CodeEditor(props: CodeEditorProps) {
     executeCode(body)
   }
 
-  function handleSubmit() {
-    const userCode = editorRef.current?.getValue() || ""
+  //TODO: Write submitted code to a backend UserCourse and handle submission logic
+  // function handleSubmit() {
+  //   const userCode = editorRef.current?.getValue() || ""
 
-    if (!userCode.trim()) {
-      return
-    }
-    toast.info("Placeholder for Submitting your code. Not implemented yet.")
-    //TODO: Write submitted code to a backend UserCourse and handle submission logic
-  }
+  //   if (!userCode.trim()) {
+  //     return
+  //   }
+  //   toast.info("Placeholder for Submitting your code. Not implemented yet.")
+  // }
 
   function formatCode() {
     if (editorRef.current) {
@@ -148,7 +148,7 @@ function CodeEditor(props: CodeEditorProps) {
   }, [testPassed, onTestPassedChange])
 
   return (
-    <Card className="bg-card gap-14 rounded-xl p-6 pr-10 pl-4 shadow-lg">
+    <Card className="bg-background gap-14 rounded-xl p-6 pr-10 pl-4 shadow-lg">
       <div className="relative h-[50dvh]">
         <Editor
           height="100%"
@@ -167,26 +167,34 @@ function CodeEditor(props: CodeEditorProps) {
         />
 
         <div className="absolute right-0 -bottom-11 flex gap-2">
-          <Button size="icon" variant={"outline"} onClick={formatCode} title="Format Code">
-            <Sparkles />
-          </Button>
-
-          <Button size="icon" variant={"outline"} onClick={handleAiHints} title="Generate AI Hints">
-            <Bot />
-          </Button>
-
-          <Button
+          <ButtonWithTooltip
+            tooltip="Format Code"
             size="icon"
             variant={"outline"}
+            onClick={formatCode}
+            disabled={isLoading}
+          >
+            <Sparkles />
+          </ButtonWithTooltip>
+
+          <ButtonWithTooltip
+            tooltip="Generate AI Hints"
+            size="icon"
+            variant={"outline"}
+            onClick={handleAiHints}
+            disabled={isLoading}
+          >
+            <Bot />
+          </ButtonWithTooltip>
+
+          <Button
+            title="Run Code"
+            variant={"default"}
             onClick={handleCodeExecution}
             disabled={isLoading}
-            title="Run Code"
           >
+            Run Code
             <Play />
-          </Button>
-          <Button disabled={isLoading} onClick={handleSubmit} title="Submit Code">
-            <SendHorizontal />
-            {isLoading ? <LoaderCircle className="animate-spin" /> : "Submit"}
           </Button>
         </div>
       </div>
