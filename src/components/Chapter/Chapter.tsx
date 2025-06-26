@@ -16,7 +16,13 @@ function Chapter() {
   const { chapterId, courseId } = useParams()
   const [adminIsEditing, setAdminIsEditing] = useState(false)
   const [testPassed, setTestPassed] = useState(false)
-  const { data, isLoading, isError, updateChapter, deleteChapter } = useChapters({
+  const {
+    data: chapters,
+    isLoading,
+    isError,
+    updateChapter,
+    deleteChapter,
+  } = useChapters({
     chapterId: chapterId!,
     courseId: courseId!,
   })
@@ -36,10 +42,10 @@ function Chapter() {
     )
   }
 
-  const chapter = data?.data?.find((c) => c.id === chapterId)
+  const chapter = chapters?.data?.find((c) => c.id === chapterId)
   if (!chapter) return
 
-  const nextChapter = data?.data?.find(
+  const nextChapter = chapters?.data?.find(
     (c) => c.chapter_num === chapter.chapter_num + 1 && c.course_id === chapter.course_id,
   )
 
