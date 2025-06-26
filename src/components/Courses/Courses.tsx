@@ -29,11 +29,10 @@ function Courses() {
         </Card>
       </AdminContext>
 
-      {!isAuthenticated && (
-        <LoginButton className="mb-4 w-full">Please log in to enroll</LoginButton>
-      )}
-
       {courses && <div className="flex flex-wrap items-center gap-4">{courseElements}</div>}
+      {!isAuthenticated && (
+        <LoginButton className="mt-4 w-full">Please log in to enroll</LoginButton>
+      )}
     </main>
   )
 }
