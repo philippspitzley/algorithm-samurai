@@ -18,7 +18,7 @@ function Terminal(props: Props) {
   const { output, isLoading, isError, hasRuntimeError, onClearOutput, testPassed } = props
 
   const testPassedStyles = testPassed
-    ? "border-8 border-terminal animate-[border-pulse_2s_ease-in-out_infinite]"
+    ? "border-8 border-green animate-[border-pulse_2s_ease-in-out_infinite]"
     : ""
 
   return (
@@ -38,7 +38,7 @@ function Terminal(props: Props) {
       </div>
       <div>
         <div
-          className={`bg-background min-h-16 rounded border p-3 font-mono text-sm ${testPassedStyles}`}
+          className={`bg-background/60 min-h-16 rounded border p-3 font-mono text-sm ${testPassedStyles}`}
         >
           {isLoading && (
             <div className="text-muted-foreground flex items-center gap-2">
