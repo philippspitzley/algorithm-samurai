@@ -1,13 +1,13 @@
-import { Circle, CircleCheck } from "lucide-react"
-import { NavLink } from "react-router-dom"
+import { Menu } from "lucide-react"
 
 import useUserCourses from "@/context/userCourses/useUserCourses"
 import { cn } from "@/lib/utils"
 import NotFound from "@/pages/NotFound"
 
-import AdminContext from "../Admin/AdminContext"
 import LoadingSpinner from "../LoadingSpinner"
-import AddChapterButton from "./AddChapterButton"
+import { Button } from "../ui/button"
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
+import SidebarContent from "./SidebarContent"
 import useChapters from "./useChapters"
 
 interface Props {
@@ -30,47 +30,40 @@ function ChapterSidebar(props: Props) {
     userCourses?.find((course) => course.course_id === courseId)?.finished_chapters || []
 
   return (
-    <div className={cn("flex flex-col items-center gap-2 max-lg:w-10", className)}>
-      <NavLink
-        to={`courses/${courseId}`}
-        end
-        className={({ isActive }) =>
-          `hover:bg-primary/5 flex min-w-50 items-center justify-between rounded-xl px-4 py-2 ${
-            isActive ? "bg-primary/10 text-primary font-semibold" : ""
-          }`
-        }
-      >
-        {title} Intro
-      </NavLink>
-
-      {chapters?.data?.map((chapter) => {
-        return (
-          <NavLink
-            key={chapter.id}
-            to={`courses/${courseId}/${chapter.id}`}
-            className={({ isActive }) =>
-              `hover:bg-primary/5 flex min-w-50 items-center justify-between rounded-xl px-4 py-2 ${
-                isActive ? "bg-primary/10 text-primary font-semibold" : ""
-              }`
-            }
-          >
-            {chapter.title}
-            {finishedChapters?.includes(chapter.id) ? (
-              <CircleCheck size={18} className="text-terminal" />
-            ) : (
-              <Circle size={18} />
-            )}
-          </NavLink>
-        )
-      })}
-      <AdminContext className="w-full">
-        <AddChapterButton
+    <>
+      {/* Desktop Sidebar - visible on md screens and up */}
+      <div className={cn("hidden flex-col items-center gap-2 md:flex", className)}>
+        <SidebarContent
           courseId={courseId!}
-          onCreateChapter={createChapter}
-          onProgressUpdate={updateMyCourseProgress}
+          title={title!}
+          chapters={chapters!}
+          finishedChapters={finishedChapters}
+          createChapter={createChapter}
+          updateMyCourseProgress={updateMyCourseProgress}
         />
-      </AdminContext>
-    </div>
+      </div>
+
+      {/* Mobile Popover - visible below md screens */}
+      <div className="md:hidden">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="icon" className="sticky z-50">
+              <Menu className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent side="right" className="w-64 p-4">
+            <SidebarContent
+              courseId={courseId!}
+              title={title!}
+              chapters={chapters!}
+              finishedChapters={finishedChapters}
+              createChapter={createChapter}
+              updateMyCourseProgress={updateMyCourseProgress}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+    </>
   )
 }
 
