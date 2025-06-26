@@ -54,7 +54,7 @@ function Chapter() {
   }
 
   return (
-    <div className="relative flex flex-6 flex-col gap-4">
+    <div className="relative flex min-w-0 flex-6 flex-col gap-4 overflow-hidden">
       <h1 className="text-3xl">{`Chapter ${chapter.chapter_num}`}</h1>
       <AdminContext>
         <AdminEditButtons
@@ -66,22 +66,22 @@ function Chapter() {
           onUpdate={updateChapter}
         />
       </AdminContext>
-
-      <Markdown
-        markdown={chapter.description}
-        onEdit={updateChapter}
-        isEditing={adminIsEditing}
-        setIsEditing={setAdminIsEditing}
-      />
-
-      {chapter.exercise && (
-        <CodeEditor
-          key={`code-editor-${chapter.id}`}
-          defaultValue={chapter.exercise}
-          testCode={chapter.test_code}
-          onTestPassedChange={setTestPassed}
+      <div className="flex-1 overflow-y-auto">
+        <Markdown
+          markdown={chapter.description}
+          onEdit={updateChapter}
+          isEditing={adminIsEditing}
+          setIsEditing={setAdminIsEditing}
         />
-      )}
+        {chapter.exercise && (
+          <CodeEditor
+            key={`code-editor-${chapter.id}`}
+            defaultValue={chapter.exercise}
+            testCode={chapter.test_code}
+            onTestPassedChange={setTestPassed}
+          />
+        )}
+      </div>
 
       <NextChapterButton
         lastChapterNum={chapters?.data && chapters.data.length}
