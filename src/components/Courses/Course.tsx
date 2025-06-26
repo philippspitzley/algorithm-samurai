@@ -2,7 +2,6 @@ import { Award, BadgeCheck, X } from "lucide-react"
 import { Link } from "react-router-dom"
 
 import { APISchemas } from "@/api/types"
-import Markdown from "@/components/Markdown/MarkdownRender"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/context/auth/useAuth"
 import { useUserCoursesContext } from "@/context/userCourses/UserCoursesContext"
@@ -10,7 +9,7 @@ import { useUserCoursesContext } from "@/context/userCourses/UserCoursesContext"
 import AdminContext from "../Admin/AdminContext"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
-import { Progress } from "../ui/progress"
+import { Progress } from "../ui/custom-progress"
 import UpdateCourseForm from "./UpdateCourseForm"
 import useCourses from "./useCourse"
 
@@ -28,17 +27,18 @@ function Course({ data: course }: Props) {
   const canAccessCourse = isAuthenticated && courseEnrolled
 
   const StatusBadge = (
-    <Badge variant={"secondary"} className="bg-terminal text-background">
+    <Badge variant={"secondary"} className="bg-primary text-primary-foreground">
       <BadgeCheck />
       {userCourse?.status}
     </Badge>
   )
-  const ProgressBadge = (
-    <Badge variant={"secondary"} className="text-background bg-amber-200">
-      <Award />
-      {userCourse?.progress}% complete
-    </Badge>
-  )
+  const completedBadge =
+    userCourse?.progress === 100 ? (
+      <Badge variant={"secondary"} className="text-primary-foreground bg-green">
+        <Award />
+        completed
+      </Badge>
+    ) : null
 
   return (
     <Card key={course.id} className="group @container relative h-68 min-w-xs flex-1 basis-sm">
@@ -59,7 +59,7 @@ function Course({ data: course }: Props) {
 
             <div className="flex gap-2">
               {StatusBadge}
-              {ProgressBadge}
+              {completedBadge}
             </div>
           </>
         ) : (
@@ -68,19 +68,18 @@ function Course({ data: course }: Props) {
       </CardHeader>
 
       {course?.description && (
-        <CardContent className="text-foreground/60 relative overflow-hidden">
-          <Markdown markdown={course.description} />
-          <div className="via-card from-card pointer-events-none absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t to-transparent" />
+        <CardContent className="relative overflow-hidden">
+          <p className="text-foreground/65 line-clamp-4">{course.description}</p>
         </CardContent>
       )}
 
-      <CardFooter>
+      <CardFooter className="mt-auto">
         {!canAccessCourse && isAuthenticated && (
           <Button onClick={() => enrollCourse(course.id)} className="w-full">
-            Enroll now
+            Enroll Now
           </Button>
         )}
-        {canAccessCourse && <Progress value={userCourse?.progress} />}
+        {canAccessCourse && <Progress value={userCourse?.progress} completionColor="bg-green" />}
       </CardFooter>
     </Card>
   )
