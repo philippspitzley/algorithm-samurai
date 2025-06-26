@@ -26,7 +26,7 @@ function CourseLayout() {
   const course = data
 
   return (
-    <Card className="bg-background/90 flex flex-row gap-6 rounded-xl border-1 p-8 backdrop-blur-lg">
+    <Card className="flex flex-row rounded-xl border-1 p-4 backdrop-blur-lg md:p-12">
       <ChapterSidebar courseId={course?.id} title={course?.title} />
       <Outlet />
     </Card>
