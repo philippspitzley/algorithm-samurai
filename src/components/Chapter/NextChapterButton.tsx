@@ -8,20 +8,25 @@ import useUserCourses from "@/context/userCourses/useUserCourses"
 import { Button } from "../ui/button"
 
 interface Props {
+  lastChapterNum?: number
   currentChapter: APISchemas["ChapterPublic"]
   nextChapter?: APISchemas["ChapterPublic"]
   testPassed: boolean
 }
 
 function NextChapterButton(props: Props) {
-  const { currentChapter: chapter, nextChapter = undefined, testPassed } = props
+  const { currentChapter: chapter, nextChapter = undefined, testPassed, lastChapterNum } = props
 
   const navigate = useNavigate()
-  const { isMyChapterCompleted, completeMyChapter, updateMyCourseProgress } = useUserCourses()
+  const { isMyChapterCompleted, completeMyChapter, updateMyCourseProgress, getMyCourse } =
+    useUserCourses()
 
   const courseId = chapter.course_id
   const chapterId = chapter.id
   const currentChapterCompleted = isMyChapterCompleted(chapter.id, courseId!)
+  const userCourse = getMyCourse(courseId)
+  const chapterNum = lastChapterNum ? lastChapterNum : 0
+  const couldFinishCourse = userCourse?.progress === chapterNum - 1 / chapterNum
 
   const handleNextChapter = () => {
     if (!courseId || !chapterId) {
@@ -50,7 +55,7 @@ function NextChapterButton(props: Props) {
     }
 
     // Case 3: Chapter completed and no next chapter - show completion message
-    if (currentChapterCompleted && !nextChapter) {
+    if (currentChapterCompleted && !nextChapter && couldFinishCourse) {
       toast.success("🎉 Congratulations! You have completed the entire course!")
       return
     }
@@ -79,11 +84,11 @@ function NextChapterButton(props: Props) {
   return (
     <>
       {nextChapter ? (
-        <Button onClick={handleNextChapter} className="bg-terminal">
+        <Button onClick={handleNextChapter}>
           Next Chapter <SquareArrowRight />
         </Button>
       ) : !currentChapterCompleted ? (
-        <Button onClick={handleNextChapter} className="bg-terminal">
+        <Button onClick={handleNextChapter} className="from-ctp-red to-ctp-pink hover:bg-linear-65">
           <PartyPopper /> Complete Chapter <PartyPopper />
         </Button>
       ) : (
