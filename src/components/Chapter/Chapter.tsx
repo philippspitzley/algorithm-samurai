@@ -78,6 +78,7 @@ function Chapter() {
       )}
 
       <NextChapterButton
+        lastChapterNum={chapters?.data && chapters.data.length}
         currentChapter={chapter}
         nextChapter={nextChapter}
         testPassed={testPassed}
