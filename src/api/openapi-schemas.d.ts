@@ -624,6 +624,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/stats/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get Public Stats */
+    get: operations["stats-get_public_stats"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/private/users/": {
     parameters: {
       query?: never
@@ -975,6 +992,13 @@ export interface components {
        * @default false
        */
       is_verified: boolean
+    }
+    /** Stats */
+    Stats: {
+      /** Total Users */
+      total_users: number
+      /** Total Courses */
+      total_courses: number
     }
     /**
      * Token
@@ -2574,6 +2598,26 @@ export interface operations {
         }
         content: {
           "application/json": unknown
+        }
+      }
+    }
+  }
+  "stats-get_public_stats": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Stats"]
         }
       }
     }
