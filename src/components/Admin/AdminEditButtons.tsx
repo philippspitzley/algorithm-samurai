@@ -37,13 +37,7 @@ function AdminEditButtons({ className, chapter, onEdit, onUpdate, onDelete, isEd
         onSubmit={onUpdate}
       />
 
-      <DeleteButton
-        onClick={onDelete}
-        className="bg-ctp-red/80 hover:bg-ctp-red"
-        size="icon"
-        tooltip="Delete Chapter"
-        item="chapter"
-      >
+      <DeleteButton onClick={onDelete} size="icon" tooltip="Delete Chapter" item="chapter">
         <>
           <X />
         </>
