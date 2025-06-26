@@ -5,6 +5,7 @@ import { toast } from "sonner"
 import { APISchemas } from "@/api/types"
 
 import LoadingSpinner from "../LoadingSpinner"
+import Markdown from "../Markdown/MarkdownRender"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion"
 import { Card, CardContent, CardHeader } from "../ui/card"
 
@@ -43,7 +44,7 @@ function AiTutor(props: Props) {
   return (
     <Card className="bg-card ml-6 rounded-lg px-4 py-4 text-left shadow-none">
       <CardHeader>AI Tutor</CardHeader>
-      <CardContent>
+      <CardContent className="-mt-4">
         {aiIsLoading && <LoadingSpinner />}
         <Accordion
           type="single"
@@ -56,9 +57,19 @@ function AiTutor(props: Props) {
             <AccordionItem value={`item-${index + 1}`} key={`item-${index + 1}`}>
               <AccordionTrigger>Hint {index + 1}</AccordionTrigger>
               <AccordionContent className="flex flex-col gap-4 text-balance">
-                <p>{hint.explanation}</p>
-                <p>{hint.hint}</p>
-                <p>{hint.next_steps.join("\n")}</p>
+                <Card className="bg-primary text-primary-foreground text-md font-mono leading-loose">
+                  <CardContent>
+                    <Markdown markdown={hint.hint} className="mb-2" />
+                    <p className="mb-1">Next steps:</p>
+                    <ol className="ml-4 list-inside space-y-1">
+                      {hint.next_steps.map((step) => (
+                        <li key={Math.random()}>
+                          <Markdown markdown={step} />
+                        </li>
+                      ))}
+                    </ol>
+                  </CardContent>
+                </Card>
               </AccordionContent>
             </AccordionItem>
           ))}
