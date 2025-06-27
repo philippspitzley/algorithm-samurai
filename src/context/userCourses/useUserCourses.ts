@@ -29,8 +29,6 @@ function useUserCourses() {
         queryClient.invalidateQueries({
           queryKey: ["get", "/api/v1/users/me/courses"],
         })
-
-        toast.success("Successfully enrolled in the course!")
       },
       onError: (error) => {
         // FIXME: add detail props to the error type
@@ -49,8 +47,6 @@ function useUserCourses() {
         queryClient.invalidateQueries({
           queryKey: ["get", "/api/v1/users/me/courses"],
         })
-
-        toast.success("Chapter completed!")
       },
       onError: () => {
         // FIXME: add detail props to the error type
@@ -69,8 +65,6 @@ function useUserCourses() {
         queryClient.invalidateQueries({
           queryKey: ["get", "/api/v1/users/me/courses"], // Add the leading slash
         })
-
-        toast.success("Progress updated")
       },
       onError: () => {
         // FIXME: add detail props to the error type
@@ -89,8 +83,6 @@ function useUserCourses() {
         queryClient.invalidateQueries({
           queryKey: ["get", "/api/v1/users/me/courses"], // Add the leading slash here too
         })
-
-        toast.success("Successfully updated chapter!")
       },
       onError: () => {
         // FIXME: add detail props to the error type
