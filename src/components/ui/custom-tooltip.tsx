@@ -8,6 +8,7 @@ function CustomTooltipProvider({
   delayDuration = 0,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
+  // eslint-disable-next-line react-x/no-context-provider
   return <TooltipPrimitive.Provider delayDuration={delayDuration} {...props} />
 }
 
