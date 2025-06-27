@@ -120,7 +120,7 @@ function UpdateChapterForm({ onSubmit: updateChapter, defaultValues: chapter }: 
                   <FormDescription>A short description of the course content.</FormDescription>
                   <FormControl>
                     <Textarea
-                      className="max-h-60"
+                      className="text-foreground max-h-60"
                       disabled={form.formState.isSubmitting}
                       placeholder="This new course teaches about ..."
                       {...field}
@@ -140,7 +140,7 @@ function UpdateChapterForm({ onSubmit: updateChapter, defaultValues: chapter }: 
                   <FormDescription>The exercise code.</FormDescription>
                   <FormControl>
                     <Textarea
-                      className="max-h-60"
+                      className="text-foreground max-h-60"
                       disabled={form.formState.isSubmitting}
                       placeholder="Enter exercise code here"
                       {...field}
@@ -159,7 +159,7 @@ function UpdateChapterForm({ onSubmit: updateChapter, defaultValues: chapter }: 
                   <FormLabel>Test Code</FormLabel>
                   <FormControl>
                     <Textarea
-                      className="max-h-60"
+                      className="text-foreground max-h-60"
                       disabled={form.formState.isSubmitting}
                       placeholder="Enter test code here"
                       {...field}
