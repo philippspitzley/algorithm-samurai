@@ -15,11 +15,8 @@ function usePistonApi() {
   const [testPassed, setTestPassed] = useState(false)
 
   const executionMutation = $api.useMutation("post", "/api/v1/piston/execute", {
-    onSuccess: () => {
-      toast.success("Code executed.")
-    },
     onError: (error) => {
-      toast.error("Something went wrong during code execution.")
+      toast.error("Something went wrong during code execution.", { duration: Infinity })
       console.error(error)
     },
   })
