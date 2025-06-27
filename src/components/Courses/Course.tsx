@@ -79,7 +79,9 @@ function Course({ data: course }: Props) {
             Enroll Now
           </Button>
         )}
-        {canAccessCourse && <Progress value={userCourse?.progress} completionColor="bg-green" />}
+        {canAccessCourse && (
+          <Progress value={userCourse?.progress} animated completionColor="bg-green" />
+        )}
       </CardFooter>
     </Card>
   )
