@@ -69,7 +69,7 @@ function MarkdownForm({ defaultValue, onEdit, setIsEditing }: Props) {
                   <Textarea
                     disabled={form.formState.isSubmitting}
                     placeholder="# My Markdown!"
-                    className="dark:bg-background bg-background resize-none px-8 pt-10 pb-14 font-mono"
+                    className="bg-background text-foreground resize-none px-8 pt-10 pb-14 font-mono"
                     {...field}
                   />
                 </FormControl>
@@ -99,7 +99,7 @@ function MarkdownForm({ defaultValue, onEdit, setIsEditing }: Props) {
         </form>
       </Form>
 
-      <Markdown markdown={watchedMarkdown} className="flex-4" />
+      <Markdown markdown={watchedMarkdown} className="w-1/2 flex-4" />
     </div>
   )
 }
