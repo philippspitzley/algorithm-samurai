@@ -25,6 +25,8 @@ function useUser() {
       enabled: isAuthenticated,
       staleTime: 5 * 60 * 1000,
       retry: (failureCount, error) => {
+        // FIXME: add detail props to the error type
+        // @ts-expect-error detail.status_code is not defined in the type
         if (error.detail.status_code === 401) {
           setIsAuthenticated(false)
           return false
@@ -47,7 +49,6 @@ function useUser() {
 
       // onSuccess
       setIsAuthenticated(true)
-      toast.success("Login successful!")
 
       // -- navigate to previous url
       const searchParams = new URLSearchParams(location.search)
@@ -59,6 +60,8 @@ function useUser() {
       // onError
       setIsAuthenticated(false)
       console.info(error)
+      // FIXME: add detail props to the error type
+      // @ts-expect-error detail is not defined in the type
       toast.error(error?.detail?.message || "Login failed")
       return false
     }
