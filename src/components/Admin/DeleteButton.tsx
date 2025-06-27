@@ -42,7 +42,7 @@ export default function DeleteButton({
           className={className}
           size={size}
           tooltip={tooltip}
-          toolTipColor="destructive"
+          toolTipBackgroundColor="bg-destructive"
           toolTipClassName="text-white"
           title={title && tooltip}
           variant="destructive"
