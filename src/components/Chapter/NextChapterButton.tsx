@@ -36,49 +36,47 @@ function NextChapterButton(props: Props) {
 
     const currentExerciseCompleted = chapter.exercise ? testPassed : true
 
-    // Case 1: Chapter not completed yet, but exercise is done - complete it and show success
+    // If chapter needs to be completed and exercise is done, complete it
     if (!currentChapterCompleted && currentExerciseCompleted) {
       completeMyChapter(chapter.id)
-      updateMyCourseProgress(courseId)
+    }
+
+    // Handle navigation and completion messages
+    if (currentExerciseCompleted || currentChapterCompleted) {
       if (nextChapter) {
         navigate(`/courses/${courseId}/${nextChapter.id}`)
       } else {
-        toast.success("🎉 Congratulations! You have completed this chapter and the entire course!")
+        const message =
+          currentChapterCompleted && couldFinishCourse
+            ? "🎉 Congratulations! You have completed the entire course!"
+            : "🎉 Congratulations! You have completed this chapter and the entire course!"
+        toast.success(message, { duration: 5000 })
       }
-      return
-    }
-
-    // Case 2: Chapter already completed and there's a next chapter - navigate
-    if (currentChapterCompleted && nextChapter) {
-      navigate(`/courses/${courseId}/${nextChapter.id}`)
-      return
-    }
-
-    // Case 3: Chapter completed and no next chapter - show completion message
-    if (currentChapterCompleted && !nextChapter && couldFinishCourse) {
-      toast.success("🎉 Congratulations! You have completed the entire course!")
-      return
-    }
-
-    // Case 4: Exercise not completed but user wants to skip - show warning
-    if (!currentExerciseCompleted && nextChapter) {
-      toast.info(
-        "🎯 Almost there! Complete the exercise to unlock the next chapter and track your progress. Ready to skip ahead anyway?",
-        {
-          action: {
-            label: "Skip Ahead",
-            onClick: () => navigate(`/courses/${courseId}/${nextChapter.id}`),
+    } else {
+      // Exercise not completed - show appropriate message
+      if (nextChapter) {
+        toast.info(
+          "🎯 Almost there! Complete the exercise to unlock the next chapter and track your progress. Ready to skip ahead anyway?",
+          {
+            action: {
+              label: "Skip Ahead",
+              onClick: () => navigate(`/courses/${courseId}/${nextChapter.id}`),
+            },
+            duration: Infinity,
           },
-        },
-      )
-      return
+        )
+      } else {
+        toast.info("💪 Complete the exercise first to finish this chapter!", {
+          cancel: {
+            label: "Ok",
+            onClick: () => undefined,
+          },
+          duration: Infinity,
+        })
+      }
     }
 
-    // Case 5: Exercise not completed and no next chapter
-    if (!currentExerciseCompleted && !nextChapter) {
-      toast.info("💪 Complete the exercise to finish this chapter!")
-      return
-    }
+    updateMyCourseProgress(courseId)
   }
 
   return (
@@ -88,8 +86,8 @@ function NextChapterButton(props: Props) {
           Next Chapter <SquareArrowRight />
         </Button>
       ) : !currentChapterCompleted ? (
-        <Button onClick={handleNextChapter} className="from-ctp-red to-ctp-pink hover:bg-linear-65">
-          <PartyPopper /> Complete Chapter <PartyPopper />
+        <Button onClick={handleNextChapter} className="from-rosewater to-pink hover:bg-linear-65">
+          <PartyPopper /> Complete Course <PartyPopper />
         </Button>
       ) : (
         <Button onClick={() => navigate("/courses")}> Try another course </Button>
