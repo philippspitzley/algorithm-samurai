@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 
 import { $api } from "@/api/api"
+import { APISchemas } from "@/api/types"
 
 function useUser() {
   const queryClient = useQueryClient()
@@ -35,6 +36,41 @@ function useUser() {
       },
     },
   )
+
+  const updateUserMutation = $api.useMutation("patch", "/api/v1/users/me", {
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["get", "/api/v1/users/me", {}] })
+    },
+    onError: (error) => {
+      // FIXME: add detail props to the error type
+      // @ts-expect-error detail.status_code is not defined in the type
+      toast.error(error.detail?.message || "Failed to update user information")
+    },
+  })
+
+  const updateUser = (userData: APISchemas["UserUpdateMe"]) => {
+    return updateUserMutation.mutate({
+      body: userData,
+    })
+  }
+
+  const updatePasswordMutation = $api.useMutation("patch", "/api/v1/users/me/password", {
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["get", "/api/v1/users/me", {}] })
+      toast.success("Password updated successfully. Please log in again.")
+    },
+    onError: (error) => {
+      // FIXME: add detail props to the error type
+      // @ts-expect-error detail.status_code is not defined in the type
+      toast.error(error?.detail?.message || "Failed to update password")
+    },
+  })
+
+  const updatePassword = (passwordData: APISchemas["UpdatePassword"]) => {
+    return updatePasswordMutation.mutate({
+      body: passwordData,
+    })
+  }
 
   const loginMutation = $api.useMutation("post", "/api/v1/login/access-token")
 
@@ -71,7 +107,7 @@ function useUser() {
     onSuccess: () => {
       setIsAuthenticated(false)
       queryClient.clear()
-      toast.success("Bye! 👋")
+      window.location.reload()
     },
     onError: (error) => {
       console.info(error)
@@ -92,6 +128,8 @@ function useUser() {
 
   return {
     user,
+    updateUser,
+    updatePassword,
     login,
     logout,
     goToLogin,
