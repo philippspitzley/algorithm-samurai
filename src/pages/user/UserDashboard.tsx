@@ -190,7 +190,7 @@ function UserDashboard() {
           {!isEditingPassword && (
             <Button variant="outline" size="sm" onClick={() => setIsEditingPassword(true)}>
               <Edit className="mr-2 h-4 w-4" />
-              Change Password
+              Edit
             </Button>
           )}
         </CardHeader>
