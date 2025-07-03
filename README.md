@@ -124,8 +124,7 @@ src/
 ├── hooks/             # Custom React hooks
 ├── lib/               # Utility functions
 ├── pages/             # Page components
-├── api/               # API client and types
-└── types/             # TypeScript type definitions
+└── api/               # API client and types
 ```
 
 ## 🛠️ Technology Stack
