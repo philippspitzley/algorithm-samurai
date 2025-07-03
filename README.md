@@ -1,5 +1,7 @@
 # Algorithm Samurai 🥷
 
+![Readme Hero](./public/images/algorithm-samurai-readme-hero.webp)
+
 <div align="center">
   
   
