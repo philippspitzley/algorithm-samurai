@@ -36,6 +36,7 @@ function App() {
                   <Route path="/courses" element={<Courses />}></Route>
 
                   <Route element={<ProtectedRoute />}>
+                    {/* AdminDashboard is a placeholder page to centralize all admin operations if needed*/}
                     <Route path="/admin" element={<AdminDashboard />} />
 
                     <Route path="/users/me" element={<UserDashboard />} />

@@ -1,28 +1,38 @@
-import { Link } from "react-router-dom"
+import { useEffect } from "react"
+
+import { Link, useNavigate } from "react-router-dom"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/context/auth/useAuth"
 
 function AdminDashboard() {
-  const { user } = useAuth()
+  const { isAdmin } = useAuth()
+  const navigate = useNavigate()
 
-  if (!user?.is_superuser) {
-    return <h1>You need admin rights!</h1>
-  }
+  useEffect(() => {
+    if (!isAdmin) {
+      toast.error("No Permissions!", { description: "Sorry back to Home 😅" })
+      navigate("/")
+    }
+  }, [isAdmin, navigate])
 
   return (
     <div>
-      <h1>AdminDashboard</h1>
+      <h1>AdminDashboard Placeholder</h1>
+      <p>
+        This page has no functionality. You can use this page to centralize all admin operations
+      </p>
       <nav className="flex justify-center">
         <ul className="flex flex-col items-center gap-4">
           <li>
             <Button>
-              <Link to="/admin/new-course">New Course</Link>
+              <Link to="/admin">New Course</Link>
             </Button>
           </li>
           <li>
             <Button>
-              <Link to="/admin/new-course">New User</Link>
+              <Link to="/admin">New User</Link>
             </Button>
           </li>
         </ul>
