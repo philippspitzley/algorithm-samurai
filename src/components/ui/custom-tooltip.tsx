@@ -71,9 +71,9 @@ function CustomTooltipContent({
         {showArrow && (
           <TooltipPrimitive.Arrow
             className={cn(
-              "z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px]",
+              "fill-accent z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px]",
               arrowColors.bg,
-              arrowColors.fill,
+              arrowColors.fill === "fill-destructive" ? "fill-destructive" : arrowColors.fill,
             )}
           />
         )}
