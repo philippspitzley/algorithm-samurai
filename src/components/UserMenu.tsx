@@ -20,8 +20,8 @@ export default function UserMenu() {
               {user?.user_name?.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           ) : (
-            <AvatarFallback>
-              <Menu></Menu>
+            <AvatarFallback className="bg-primary hover:bg-accent text-primary-foreground font-extrabold">
+              <Menu size={16} />
             </AvatarFallback>
           )}
         </Avatar>
