@@ -131,32 +131,31 @@ src/
 
 ### Frontend
 
-- **React 19** - Modern UI library with latest features
-- **TypeScript** - Type-safe JavaScript for better development experience
-- **Vite** - Fast build tool and development server
-- **TailwindCSS** - Utility-first CSS framework
-- **Shadcn** - Component library with pre-styled Radix UI primitives
+- **[React 19](https://reactjs.org/)** - Modern UI library with latest features
+- **[TypeScript](https://typescriptlang.org/)** - Type-safe JavaScript for better development experience
+- **[Vite](https://vitejs.dev/)** - Fast build tool and development server
+- **[TailwindCSS](https://tailwindcss.com/)** - Utility-first CSS framework
+- **[Shadcn](https://ui.shadcn.com/)** - Component library with pre-styled Radix UI primitives
 
 ### Code Execution & AI
 
-- **Monaco Editor** - VS Code-powered code editor
-- **Piston API** - Secure code execution environment
-- **Shiki** - Syntax highlighting for code blocks
-- **Gemini AI Tutor** - Integration of AI-powered learning assistant from [Algorithm Sensei Backend](https://github.com/philippspitzley/algorithm-sensei.git)
+- **[Monaco Editor](https://www.npmjs.com/package/@monaco-editor/react)** - VS Code-powered code editor
+- **[Piston API](https://github.com/engineer-man/piston)** - Secure code execution environment
+- **[Shiki](https://shiki.style/)** - Syntax highlighting for code blocks
+- **[Gemini AI Tutor](https://ai.google.dev/)** - Integration of AI-powered learning assistant from [Algorithm Sensei Backend](https://github.com/philippspitzley/algorithm-sensei.git)
 
 ### State Management & Data
 
-- **TanStack Query** - Powerful data fetching and caching
-- **React Hook Form** - Efficient form handling
-- **Zod** - Runtime type validation
-- **OpenAPI** - Type-safe API client generation from algorithm-sensei backend
+- **[TanStack Query](https://tanstack.com/query/latest)** - Powerful data fetching and caching
+- **[React Hook Form](https://react-hook-form.com/)** - Efficient form handling
+- **[Zod](https://zod.dev/)** - Runtime type validation
 
 ### Development Tools
 
-- **ESLint** - Code linting and quality checks
-- **Prettier** - Code formatting
-- **Husky** - Git hooks for quality assurance
-- **OpenAPI TypeScript Generator** - Auto-generates type-safe API client from backend schemas
+- **[ESLint](https://eslint.org/)** - Code linting and quality checks
+- **[Prettier](https://prettier.io/)** - Code formatting
+- **[Husky](https://typicode.github.io/husky/)** - Git hooks for quality assurance
+- **[OpenAPI TS](https://swagger.io/specification/)** - Type-safe API client generation of [openapi](https://www.openapis.org/) types from [Algorithm Sensei Backend](https://github.com/philippspitzley/algorithm-sensei.git)
 
 ### OpenAPI Integration
 
